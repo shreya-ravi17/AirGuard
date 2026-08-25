@@ -31,5 +31,5 @@ print(f"MAE:  {mae:.2f}")
 print(f"RMSE: {rmse:.2f}")
 print(f"R2 Score: {r2:.4f}")
 
-joblib.dump(model, 'models/rf_model_regressor.pkl')
-print("\nModel saved to models/rf_model_regressor.pkl")
+joblib.dump(model, 'models/rf_regressor.pkl')
+print("\nModel saved to models/rf_regressor.pkl")
