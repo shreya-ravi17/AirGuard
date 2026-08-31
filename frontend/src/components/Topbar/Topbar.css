@@ -1,0 +1,369 @@
+.airguard-topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+
+  height: 72px;
+
+  padding: 0 28px;
+
+  background: rgba(255, 255, 255, 0.96);
+
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+
+  border-bottom: 1px solid #edf2ee;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  z-index: 1500;
+
+  box-sizing: border-box;
+}
+
+
+/* ================= LEFT ================= */
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+
+/* ================= HAMBURGER ================= */
+
+.hamburger-button {
+  width: 42px;
+  height: 42px;
+
+  border: 1px solid #dfeae2;
+
+  border-radius: 12px;
+
+  background: #ffffff;
+
+  color: #52705d;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.hamburger-button:hover {
+  background: #edf8f0;
+
+  color: #358453;
+
+  transform: translateY(-1px);
+
+  box-shadow: 0 5px 15px rgba(55, 130, 80, 0.12);
+}
+
+.hamburger-button:active {
+  transform: scale(0.94);
+}
+
+
+/* ================= MOBILE LOGO ================= */
+
+.mobile-logo {
+  display: none;
+
+  align-items: center;
+
+  gap: 9px;
+
+  color: #20382a;
+
+  font-size: 18px;
+
+  font-weight: 750;
+}
+
+.mobile-logo-symbol {
+  width: 34px;
+  height: 34px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 10px;
+
+  background: #e7f6eb;
+
+  color: #3f9360;
+
+  font-weight: 800;
+}
+
+
+/* ================= SEARCH ================= */
+
+.topbar-search {
+  position: absolute;
+
+  left: 50%;
+
+  transform: translateX(-50%);
+
+  width: min(420px, 38vw);
+
+  height: 40px;
+
+  padding: 0 12px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 9px;
+
+  background: #f6f9f7;
+
+  border: 1px solid #edf2ee;
+
+  border-radius: 12px;
+
+  color: #94a099;
+
+  transition: 0.2s ease;
+}
+
+.topbar-search:focus-within {
+  background: #ffffff;
+
+  border-color: #b9d8c1;
+
+  box-shadow: 0 0 0 3px rgba(83, 168, 110, 0.08);
+}
+
+.topbar-search input {
+  flex: 1;
+
+  min-width: 0;
+
+  border: none;
+
+  outline: none;
+
+  background: transparent;
+
+  color: #33463a;
+
+  font-size: 12px;
+}
+
+.topbar-search input::placeholder {
+  color: #a1aaa5;
+}
+
+.search-shortcut {
+  padding: 3px 6px;
+
+  border-radius: 5px;
+
+  background: #ffffff;
+
+  border: 1px solid #e6ebe7;
+
+  font-size: 9px;
+
+  color: #a1aaa5;
+}
+
+
+/* ================= RIGHT ================= */
+
+.topbar-right {
+  display: flex;
+
+  align-items: center;
+
+  gap: 16px;
+}
+
+
+/* ================= NOTIFICATION ================= */
+
+.notification-button {
+  position: relative;
+
+  width: 38px;
+  height: 38px;
+
+  border: none;
+
+  background: transparent;
+
+  border-radius: 11px;
+
+  color: #66766d;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+.notification-button:hover {
+  background: #f0f8f2;
+
+  color: #3e8e5b;
+
+  transform: translateY(-1px);
+}
+
+.notification-dot {
+  position: absolute;
+
+  top: 7px;
+  right: 7px;
+
+  width: 7px;
+  height: 7px;
+
+  border-radius: 50%;
+
+  background: #68b77e;
+
+  border: 2px solid white;
+}
+
+
+/* ================= DIVIDER ================= */
+
+.topbar-divider {
+  width: 1px;
+
+  height: 30px;
+
+  background: #e8ede9;
+}
+
+
+/* ================= PROFILE ================= */
+
+.profile-button {
+  display: flex;
+
+  align-items: center;
+
+  gap: 9px;
+
+  border: none;
+
+  background: transparent;
+
+  cursor: pointer;
+
+  color: #718078;
+
+  padding: 4px;
+
+  border-radius: 10px;
+
+  transition: 0.2s ease;
+}
+
+.profile-button:hover {
+  background: #f5f9f6;
+}
+
+.profile-avatar {
+  width: 35px;
+  height: 35px;
+
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #e7f5eb;
+
+  color: #428a59;
+
+  font-weight: 700;
+
+  font-size: 12px;
+}
+
+.profile-info {
+  text-align: left;
+}
+
+.profile-info strong,
+.profile-info span {
+  display: block;
+}
+
+.profile-info strong {
+  font-size: 11px;
+
+  color: #34463b;
+}
+
+.profile-info span {
+  margin-top: 2px;
+
+  font-size: 9px;
+
+  color: #9aa59f;
+}
+
+
+/* ================= MOBILE ================= */
+
+@media (max-width: 899px) {
+
+  .airguard-topbar {
+    padding: 0 16px;
+  }
+
+  .mobile-logo {
+    display: flex;
+  }
+
+  .topbar-search {
+    display: none;
+  }
+
+  .profile-info,
+  .profile-button > svg {
+    display: none;
+  }
+
+  .topbar-right {
+    gap: 6px;
+  }
+}
+
+
+/* ================= SMALL MOBILE ================= */
+
+@media (max-width: 480px) {
+
+  .mobile-logo span {
+    font-size: 16px;
+  }
+
+  .hamburger-button {
+    width: 40px;
+    height: 40px;
+  }
+}

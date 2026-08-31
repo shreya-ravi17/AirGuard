@@ -1,0 +1,1611 @@
+
+/* =========================================================
+   AIRGUARD PREMIUM DASHBOARD
+   White + Very Light Green Theme
+   ========================================================= */
+
+* {
+  box-sizing: border-box;
+}
+
+.airguard-dashboard {
+  position: relative;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background:
+    radial-gradient(
+      circle at 5% 5%,
+      rgba(218, 244, 224, 0.65),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at 95% 35%,
+      rgba(232, 248, 236, 0.75),
+      transparent 25%
+    ),
+    #f9fcfa;
+  color: #263a2d;
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  animation: dashboardFade 0.7s ease forwards;
+}
+
+/* =========================================================
+   BACKGROUND ORBS
+   ========================================================= */
+
+.dashboard-orb {
+  position: fixed;
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(90px);
+  opacity: 0.35;
+  z-index: 0;
+  animation: orbFloat 10s ease-in-out infinite alternate;
+}
+
+.orb-one {
+  top: 90px;
+  right: -150px;
+  background: rgba(174, 224, 186, 0.6);
+}
+
+.orb-two {
+  bottom: -120px;
+  left: -130px;
+  background: rgba(201, 235, 210, 0.65);
+  animation-delay: 3s;
+}
+
+/* =========================================================
+   TOPBAR
+   ========================================================= */
+
+.dashboard-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  padding: 0 34px;
+  background: rgba(255, 255, 255, 0.9);
+  border-bottom: 1px solid #eaf1ec;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+/* BRAND */
+
+.brand-section {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.airguard-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #2e4836;
+  font-size: 18px;
+  font-weight: 750;
+  letter-spacing: -0.5px;
+}
+
+.logo-symbol {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 11px;
+  background: linear-gradient(
+    145deg,
+    #70b984,
+    #4f9e66
+  );
+  color: white;
+  font-size: 16px;
+  font-weight: 800;
+  box-shadow:
+    0 7px 18px rgba(80, 159, 102, 0.2);
+  animation: logoPulse 3s ease-in-out infinite;
+}
+
+/* =========================================================
+   SEARCH
+   ========================================================= */
+
+.dashboard-search {
+  width: 270px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 0 12px;
+  border: 1px solid #e5ede7;
+  border-radius: 12px;
+  background: #f8fbf9;
+  color: #96a29a;
+  transition:
+    width 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease,
+    background 0.3s ease;
+}
+
+.dashboard-search:focus-within {
+  width: 310px;
+  background: white;
+  border-color: #b9d9c1;
+  box-shadow:
+    0 8px 25px rgba(65, 120, 78, 0.08);
+}
+
+.dashboard-search input {
+  width: 100%;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: #425249;
+  font-size: 12px;
+}
+
+.dashboard-search input::placeholder {
+  color: #a4aea8;
+}
+
+.search-shortcut {
+  width: 22px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 5px;
+  background: white;
+  border: 1px solid #e9eeea;
+  color: #a1aaa5;
+  font-size: 10px;
+}
+
+/* =========================================================
+   TOPBAR RIGHT
+   ========================================================= */
+
+.topbar-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 21px;
+}
+
+.location-info,
+.weather-info {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #78867d;
+  font-size: 11px;
+}
+
+.location-info svg,
+.weather-info svg {
+  color: #69a978;
+}
+
+.weather-info strong {
+  color: #435449;
+  font-size: 12px;
+}
+
+.weather-info span {
+  color: #9ca69f;
+}
+
+/* NOTIFICATION */
+
+.notification-button {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid #e7eee9;
+  border-radius: 10px;
+  background: white;
+  color: #69776e;
+  cursor: pointer;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.notification-button:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 8px 20px rgba(50, 90, 61, 0.08);
+}
+
+.notification-count {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #67aa76;
+  color: white;
+  font-size: 8px;
+  font-weight: 700;
+  border: 2px solid white;
+  animation: notificationPulse 2s infinite;
+}
+
+/* PROFILE */
+
+.profile-info {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding-left: 4px;
+  flex-shrink: 0;
+}
+
+.profile-avatar {
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #e8f5eb;
+  color: #589766;
+  font-size: 12px;
+  font-weight: 750;
+  border: 1px solid #d9ecdd;
+}
+
+.profile-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.profile-text span {
+  color: #a1aaa5;
+  font-size: 9px;
+}
+
+.profile-text strong {
+  color: #435249;
+  font-size: 11px;
+}
+
+/* =========================================================
+   MAIN CONTENT
+   ========================================================= */
+
+.dashboard-content {
+  position: relative;
+  z-index: 1;
+  width: min(1400px, 100%);
+  margin: 0 auto;
+  padding: 44px 42px 60px;
+}
+
+/* =========================================================
+   WELCOME
+   ========================================================= */
+
+.dashboard-welcome {
+  margin-bottom: 28px;
+  animation:
+    slideUp 0.7s ease both;
+}
+
+.welcome-label,
+.card-label {
+  display: block;
+  color: #70a07b;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.dashboard-welcome h1 {
+  margin: 10px 0 10px;
+  color: #25392c;
+  font-size: clamp(32px, 3.2vw, 48px);
+  line-height: 1.08;
+  letter-spacing: -2px;
+  font-weight: 760;
+}
+
+.dashboard-welcome h1 span {
+  color: #59a56c;
+}
+
+.dashboard-welcome p {
+  max-width: 650px;
+  margin: 0;
+  color: #7d8b82;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+/* =========================================================
+   HERO GRID
+   ========================================================= */
+
+.dashboard-hero-grid {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(0, 1fr);
+  gap: 20px;
+  animation:
+    slideUp 0.8s ease 0.1s both;
+}
+
+/* =========================================================
+   INTRO CARD
+   ========================================================= */
+
+.intro-card {
+  position: relative;
+  min-height: 385px;
+  overflow: hidden;
+  border-radius: 25px;
+  border: 1px solid #dfeee2;
+  background:
+    linear-gradient(
+      135deg,
+      #f2fbf4 0%,
+      #e5f5e9 100%
+    );
+  box-shadow:
+    0 18px 45px rgba(61, 112, 72, 0.07);
+}
+
+.intro-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      circle at 80% 20%,
+      rgba(255, 255, 255, 0.85),
+      transparent 30%
+    );
+  pointer-events: none;
+}
+
+.intro-content {
+  position: relative;
+  z-index: 3;
+  width: 65%;
+  padding: 40px;
+}
+
+.intro-card .card-label {
+  color: #6b9b77;
+}
+
+.intro-card h2 {
+  margin: 15px 0;
+  color: #294132;
+  font-size: clamp(30px, 3vw, 40px);
+  line-height: 1.08;
+  letter-spacing: -1.6px;
+}
+
+.intro-card h2 span {
+  color: #55a36a;
+}
+
+.intro-card p {
+  max-width: 400px;
+  margin: 0;
+  color: #718178;
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+.intro-buttons {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin-top: 26px;
+}
+
+.primary-button,
+.secondary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  height: 42px;
+  padding: 0 17px;
+  border-radius: 11px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    background 0.25s ease;
+}
+
+.primary-button {
+  border: 1px solid #5da96e;
+  background: #5da96e;
+  color: white;
+  box-shadow:
+    0 8px 18px rgba(86, 163, 105, 0.18);
+}
+
+.primary-button:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 13px 25px rgba(86, 163, 105, 0.25);
+}
+
+.secondary-button {
+  border: 1px solid #d1e4d5;
+  background: rgba(255, 255, 255, 0.65);
+  color: #60806a;
+}
+
+.secondary-button:hover {
+  transform: translateY(-3px);
+  background: white;
+  box-shadow:
+    0 10px 22px rgba(55, 100, 64, 0.08);
+}
+
+/* =========================================================
+   INTRO DECORATION
+   ========================================================= */
+
+.intro-decoration {
+  position: absolute;
+  right: -45px;
+  bottom: -55px;
+  width: 270px;
+  height: 270px;
+  pointer-events: none;
+}
+
+.leaf-circle {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(93, 169, 110, 0.16);
+  animation:
+    decorationFloat 7s ease-in-out infinite;
+}
+
+.circle-one {
+  width: 230px;
+  height: 230px;
+  right: 0;
+  bottom: 0;
+}
+
+.circle-two {
+  width: 170px;
+  height: 170px;
+  right: 30px;
+  bottom: 30px;
+  animation-delay: 1s;
+}
+
+.circle-three {
+  width: 110px;
+  height: 110px;
+  right: 60px;
+  bottom: 60px;
+  background: rgba(255, 255, 255, 0.3);
+  animation-delay: 2s;
+}
+
+.floating-leaf {
+  position: absolute;
+  right: 105px;
+  bottom: 100px;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 17px;
+  background: rgba(255, 255, 255, 0.65);
+  color: #63a875;
+  font-size: 22px;
+  box-shadow:
+    0 15px 30px rgba(70, 125, 82, 0.1);
+  backdrop-filter: blur(8px);
+  animation:
+    leafFloat 4s ease-in-out infinite;
+}
+
+/* =========================================================
+   AQI CARD
+   ========================================================= */
+
+.aqi-card {
+  position: relative;
+  min-width: 0;
+  min-height: 385px;
+  padding: 30px;
+  overflow: hidden;
+  border-radius: 25px;
+  border: 1px solid #e5eee7;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow:
+    0 18px 45px rgba(44, 75, 54, 0.06);
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.aqi-card:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 22px 50px rgba(44, 75, 54, 0.09);
+}
+
+.aqi-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 15px;
+}
+
+.aqi-location {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  color: #8c9891;
+  font-size: 11px;
+}
+
+.aqi-location svg {
+  color: #65a575;
+}
+
+.live-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  padding: 7px 11px;
+  border-radius: 20px;
+  background: #edf8ef;
+  color: #65a174;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+}
+
+.live-status span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #66ad77;
+  animation: livePulse 1.7s infinite;
+}
+
+/* =========================================================
+   AQI MAIN - FIXED
+   ========================================================= */
+
+.aqi-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 170px;
+  align-items: center;
+  gap: 18px;
+  margin-top: 18px;
+  width: 100%;
+}
+
+.aqi-number-area {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.aqi-number {
+  display: block;
+  width: 100%;
+  margin: 0;
+  color: #2f4636;
+  font-size: clamp(56px, 6vw, 82px);
+  line-height: 0.95;
+  font-weight: 760;
+  letter-spacing: -5px;
+  white-space: nowrap;
+}
+
+.aqi-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  width: fit-content;
+  margin-top: 11px;
+  padding: 7px 12px;
+  border-radius: 20px;
+  background: #edf8ef;
+  color: #5d9b69;
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.aqi-status span {
+  width: 6px;
+  height: 6px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #61aa70;
+}
+
+.aqi-number-area p {
+  width: 100%;
+  max-width: 220px;
+  margin: 12px 0 0;
+  color: #87948c;
+  font-size: 11px;
+  line-height: 1.7;
+}
+
+/* =========================================================
+   AQI GAUGE - FIXED
+   ========================================================= */
+
+.aqi-gauge {
+  position: relative;
+  width: 170px;
+  height: 170px;
+  flex-shrink: 0;
+  justify-self: end;
+}
+
+.aqi-gauge svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.gauge-track {
+  fill: none;
+  stroke: #edf3ee;
+  stroke-width: 11;
+}
+
+.gauge-value {
+  fill: none;
+  stroke: #69af7a;
+  stroke-width: 11;
+  stroke-linecap: round;
+  stroke-dasharray: 427.25;
+  stroke-dashoffset: 427.25;
+  animation:
+    gaugeDraw 1.8s ease-out 0.4s forwards;
+  filter:
+    drop-shadow(
+      0 5px 7px rgba(94, 169, 110, 0.2)
+    );
+}
+
+.gauge-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.gauge-center strong {
+  color: #567160;
+  font-size: 14px;
+}
+
+.gauge-center span {
+  margin-top: 4px;
+  color: #a2aca5;
+  font-size: 9px;
+}
+
+/* =========================================================
+   SENSOR SUMMARY
+   ========================================================= */
+
+.sensor-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 19px;
+}
+
+.mini-sensor {
+  min-width: 0;
+  padding: 11px;
+  border: 1px solid #edf2ee;
+  border-radius: 12px;
+  background: #f8fbf9;
+  transition:
+    transform 0.25s ease,
+    background 0.25s ease;
+}
+
+.mini-sensor:hover {
+  transform: translateY(-3px);
+  background: #f1f9f3;
+}
+
+.mini-sensor span,
+.mini-sensor small {
+  display: block;
+}
+
+.mini-sensor span {
+  color: #78857d;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.mini-sensor strong {
+  display: block;
+  margin: 6px 0 3px;
+  color: #42564a;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.mini-sensor small {
+  color: #929d96;
+  font-size: 9px;
+}
+
+/* =========================================================
+   ENVIRONMENT ROW
+   ========================================================= */
+
+.environment-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 15px;
+  animation:
+    slideUp 0.8s ease 0.25s both;
+}
+
+.environment-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  padding: 18px 20px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #e3ece5;
+  box-shadow:
+    0 8px 22px rgba(48, 78, 57, 0.035);
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.environment-card:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 13px 27px rgba(48, 78, 57, 0.07);
+}
+
+.environment-icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 11px;
+  background: #edf8f0;
+  color: #68a577;
+}
+
+.environment-card span,
+.environment-card strong {
+  display: block;
+}
+
+.environment-card span {
+  margin-bottom: 5px;
+  color: #89968e;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.environment-card strong {
+  color: #3f5146;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.environment-card .connected {
+  color: #5ca46b;
+}
+
+/* =========================================================
+   FEATURES SECTION
+   ========================================================= */
+
+.features-section {
+  margin-top: 58px;
+  animation:
+    slideUp 0.9s ease 0.35s both;
+}
+
+.features-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.features-heading h2 {
+  margin: 9px 0 0;
+  color: #2b4032;
+  font-size: 32px;
+  line-height: 1.1;
+  letter-spacing: -1.2px;
+}
+
+.features-heading h2 span {
+  color: #5ba66d;
+}
+
+.features-heading > p {
+  max-width: 340px;
+  margin: 0;
+  color: #849189;
+  font-size: 12px;
+  line-height: 1.7;
+  text-align: right;
+}
+
+/* =========================================================
+   FEATURE GRID
+   ========================================================= */
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.feature-card {
+  position: relative;
+  min-height: 210px;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 21px;
+  overflow: hidden;
+  border-radius: 18px;
+  border: 1px solid #e6eee8;
+  background: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  box-shadow:
+    0 9px 28px rgba(46, 79, 56, 0.04);
+  opacity: 0;
+  animation:
+    featureAppear 0.65s ease forwards;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease,
+    border-color 0.3s ease;
+}
+
+.feature-card::before {
+  content: "";
+  position: absolute;
+  width: 110px;
+  height: 110px;
+  right: -50px;
+  top: -50px;
+  border-radius: 50%;
+  background: #edf8ef;
+  opacity: 0;
+  transition:
+    transform 0.4s ease,
+    opacity 0.4s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-8px);
+  border-color: #d2e6d6;
+  box-shadow:
+    0 20px 38px rgba(48, 91, 60, 0.09);
+}
+
+.feature-card:hover::before {
+  opacity: 1;
+  transform: scale(1.7);
+}
+
+/* FEATURE TOP */
+
+.feature-top {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.feature-icon {
+  width: 45px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 13px;
+  background: #edf8f0;
+  color: #5fa471;
+  transition:
+    transform 0.3s ease,
+    background 0.3s ease,
+    color 0.3s ease;
+}
+
+.feature-card:hover .feature-icon {
+  transform:
+    translateY(-4px)
+    rotate(-3deg);
+  background: #5fa471;
+  color: white;
+  box-shadow:
+    0 9px 18px rgba(92, 165, 110, 0.2);
+}
+
+.feature-arrow {
+  color: #a5aea8;
+  transition:
+    transform 0.3s ease,
+    color 0.3s ease;
+}
+
+.feature-card:hover .feature-arrow {
+  transform:
+    translate(3px, -3px);
+  color: #61a574;
+}
+
+/* FEATURE CONTENT */
+
+.feature-content {
+  position: relative;
+  z-index: 2;
+  margin-top: 21px;
+}
+
+.feature-content h3 {
+  margin: 0 0 8px;
+  color: #34483b;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.feature-content p {
+  margin: 0;
+  color: #7f8d84;
+  font-size: 11px;
+  line-height: 1.7;
+}
+
+/* FEATURE LINK */
+
+.feature-link {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: auto;
+  padding-top: 15px;
+  color: #63a474;
+  font-size: 10px;
+  font-weight: 750;
+  opacity: 0;
+  transform: translateY(5px);
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+}
+
+.feature-card:hover .feature-link {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.dashboard-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 50px;
+  padding-top: 19px;
+  border-top: 1px solid #e7eee9;
+  color: #8f9b94;
+  font-size: 10px;
+}
+
+/* =========================================================
+   MOBILE MENU
+   ========================================================= */
+
+.mobile-menu {
+  display: none;
+}
+
+.mobile-menu-panel {
+  display: none;
+}
+
+/* =========================================================
+   ANIMATIONS
+   ========================================================= */
+
+@keyframes dashboardFade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes featureAppear {
+  from {
+    opacity: 0;
+    transform:
+      translateY(28px)
+      scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform:
+      translateY(0)
+      scale(1);
+  }
+}
+
+@keyframes gaugeDraw {
+  to {
+    stroke-dashoffset: 391.5;
+  }
+}
+
+@keyframes livePulse {
+  0% {
+    box-shadow:
+      0 0 0 0 rgba(99, 171, 116, 0.5);
+  }
+
+  70% {
+    box-shadow:
+      0 0 0 7px rgba(99, 171, 116, 0);
+  }
+
+  100% {
+    box-shadow:
+      0 0 0 0 rgba(99, 171, 116, 0);
+  }
+}
+
+@keyframes notificationPulse {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.12);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes logoPulse {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+@keyframes orbFloat {
+  from {
+    transform: translate(0, 0);
+  }
+
+  to {
+    transform: translate(35px, -25px);
+  }
+}
+
+@keyframes decorationFloat {
+  0%,
+  100% {
+    transform:
+      translateY(0)
+      rotate(0deg);
+  }
+
+  50% {
+    transform:
+      translateY(-8px)
+      rotate(2deg);
+  }
+}
+
+@keyframes leafFloat {
+  0%,
+  100% {
+    transform:
+      translateY(0)
+      rotate(0deg);
+  }
+
+  50% {
+    transform:
+      translateY(-10px)
+      rotate(5deg);
+  }
+}
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 1150px) {
+  .dashboard-topbar {
+    padding: 0 22px;
+    gap: 16px;
+  }
+
+  .dashboard-search {
+    width: 220px;
+  }
+
+  .dashboard-search:focus-within {
+    width: 250px;
+  }
+
+  .location-info {
+    display: none;
+  }
+
+  .dashboard-content {
+    padding: 34px 25px 50px;
+  }
+
+  .features-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* =========================================================
+   AQI WIDTH SAFETY
+   ========================================================= */
+
+@media (max-width: 1000px) {
+  .aqi-main {
+    grid-template-columns: minmax(0, 1fr) 145px;
+    gap: 12px;
+  }
+
+  .aqi-gauge {
+    width: 145px;
+    height: 145px;
+  }
+
+  .aqi-number {
+    font-size: clamp(52px, 7vw, 70px);
+    letter-spacing: -4px;
+  }
+
+  .aqi-card {
+    padding: 25px;
+  }
+}
+
+/* =========================================================
+   SMALL TABLET
+   ========================================================= */
+
+@media (max-width: 850px) {
+  .dashboard-topbar {
+    height: 64px;
+  }
+
+  .mobile-menu {
+    display: flex;
+  }
+
+  .dashboard-search {
+    flex: 1;
+    max-width: 300px;
+  }
+
+  .weather-info span {
+    display: none;
+  }
+
+  .profile-text {
+    display: none;
+  }
+
+  .dashboard-hero-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .intro-card,
+  .aqi-card {
+    min-height: 360px;
+  }
+
+  /* AQI becomes horizontal again on tablet */
+  .aqi-main {
+    grid-template-columns: minmax(0, 1fr) 160px;
+  }
+
+  .aqi-gauge {
+    width: 160px;
+    height: 160px;
+  }
+
+  .environment-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .features-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .features-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .features-heading > p {
+    text-align: left;
+  }
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+  .dashboard-topbar {
+    padding: 0 15px;
+    gap: 12px;
+  }
+
+  .airguard-logo span {
+    display: none;
+  }
+
+  .logo-symbol {
+    width: 32px;
+    height: 32px;
+  }
+
+  .dashboard-search {
+    height: 36px;
+    width: auto;
+    flex: 1;
+    max-width: none;
+  }
+
+  .dashboard-search:focus-within {
+    width: auto;
+  }
+
+  .search-shortcut {
+    display: none;
+  }
+
+  .weather-info {
+    display: none;
+  }
+
+  .notification-button {
+    width: 32px;
+    height: 32px;
+  }
+
+  .dashboard-content {
+    padding: 27px 15px 40px;
+  }
+
+  .dashboard-welcome h1 {
+    font-size: 31px;
+    letter-spacing: -1.3px;
+  }
+
+  .dashboard-welcome p {
+    font-size: 12px;
+  }
+
+  .intro-content {
+    width: 100%;
+    padding: 27px;
+  }
+
+  .intro-card {
+    min-height: 390px;
+  }
+
+  .intro-card h2 {
+    font-size: 29px;
+  }
+
+  .intro-card p {
+    max-width: 280px;
+    font-size: 12px;
+  }
+
+  .intro-buttons {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .intro-decoration {
+    right: -85px;
+    opacity: 0.65;
+  }
+
+  /* =====================================================
+     MOBILE AQI FIX
+     ===================================================== */
+
+  .aqi-card {
+    padding: 21px;
+    min-height: auto;
+  }
+
+  .aqi-card-header {
+    gap: 10px;
+  }
+
+  .aqi-main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    width: 100%;
+    text-align: center;
+  }
+
+  .aqi-number-area {
+    width: 100%;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .aqi-number {
+    width: auto;
+    margin: 0;
+    font-size: 72px;
+    line-height: 0.95;
+    letter-spacing: -4px;
+    white-space: nowrap;
+  }
+
+  .aqi-status {
+    margin-top: 12px;
+  }
+
+  .aqi-number-area p {
+    width: 100%;
+    max-width: 280px;
+    margin: 12px auto 0;
+  }
+
+  .aqi-gauge {
+    width: 155px;
+    height: 155px;
+    flex-shrink: 0;
+    justify-self: center;
+  }
+
+  .sensor-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .environment-row {
+    grid-template-columns: 1fr;
+  }
+
+  .features-section {
+    margin-top: 42px;
+  }
+
+  .features-heading h2 {
+    font-size: 27px;
+  }
+
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .feature-card {
+    min-height: 190px;
+  }
+
+  .feature-link {
+    opacity: 1;
+    transform: none;
+  }
+
+  .dashboard-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 7px;
+  }
+
+  /* MOBILE MENU */
+
+  .mobile-menu-panel {
+    position: fixed;
+    top: 64px;
+    left: 12px;
+    right: 12px;
+    z-index: 99;
+    display: flex;
+    flex-direction: column;
+    padding: 8px;
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.96);
+    border: 1px solid #e4eee7;
+    box-shadow:
+      0 18px 40px rgba(40, 75, 48, 0.12);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition:
+      opacity 0.25s ease,
+      transform 0.25s ease,
+      visibility 0.25s ease;
+    backdrop-filter: blur(15px);
+  }
+
+  .mobile-menu-panel.mobile-menu-open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .mobile-menu-panel div {
+    padding: 13px;
+    border-radius: 9px;
+    color: #56675d;
+    font-size: 11px;
+    cursor: pointer;
+    transition:
+      background 0.2s ease,
+      color 0.2s ease;
+  }
+
+  .mobile-menu-panel div:hover {
+    background: #edf8f0;
+    color: #579766;
+  }
+}
+
+/* =========================================================
+   VERY SMALL PHONES
+   ========================================================= */
+
+@media (max-width: 380px) {
+  .dashboard-topbar {
+    gap: 8px;
+    padding: 0 10px;
+  }
+
+  .dashboard-content {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .aqi-card {
+    padding: 18px;
+  }
+
+  .aqi-number {
+    font-size: 64px;
+  }
+
+  .aqi-gauge {
+    width: 140px;
+    height: 140px;
+  }
+
+  .sensor-summary {
+    gap: 6px;
+  }
+
+  .mini-sensor {
+    padding: 9px;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION ACCESSIBILITY
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

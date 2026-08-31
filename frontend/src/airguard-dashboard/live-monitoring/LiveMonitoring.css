@@ -1,0 +1,894 @@
+/* =========================================================
+   AIRGUARD - LIVE MONITORING
+   Premium White + Light Green Theme
+   ========================================================= */
+
+.live-page {
+  min-height: 100vh;
+  padding: 32px;
+  background: #f7fbf8;
+  color: #172033;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+}
+
+
+/* =========================================================
+   PAGE HEADER
+   ========================================================= */
+
+.live-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 28px;
+  animation: fadeDown 0.7s ease;
+}
+
+.live-title {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.live-title-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e7f7ec;
+  color: #2fa84f;
+  box-shadow: 0 8px 25px rgba(47, 168, 79, 0.08);
+}
+
+.live-title span,
+.section-heading span,
+.small-label,
+.status-card > div > span,
+.health-card > div > span {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  color: #2fa84f;
+}
+
+.live-title h1 {
+  margin: 3px 0 4px;
+  font-size: 30px;
+  font-weight: 750;
+  letter-spacing: -0.8px;
+}
+
+.live-title p {
+  margin: 0;
+  color: #7b8494;
+  font-size: 14px;
+}
+
+
+/* =========================================================
+   HEADER CONTROLS
+   ========================================================= */
+
+.live-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.device-select {
+  height: 44px;
+  padding: 0 16px;
+  border: 1px solid #e2ebe4;
+  border-radius: 12px;
+  background: white;
+  color: #273142;
+  font-size: 13px;
+  font-weight: 600;
+  outline: none;
+  cursor: pointer;
+  transition: 0.25s ease;
+}
+
+.device-select:hover {
+  border-color: #9ed5ac;
+}
+
+.refresh-toggle {
+  height: 44px;
+  padding: 0 15px;
+  border: 1px solid #e2ebe4;
+  border-radius: 12px;
+  background: white;
+  color: #7b8494;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.25s ease;
+}
+
+.refresh-toggle:hover {
+  border-color: #9ed5ac;
+}
+
+.refresh-toggle.active {
+  color: #2fa84f;
+  background: #f0faf3;
+  border-color: #ccebd4;
+}
+
+.toggle-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #aab3bd;
+}
+
+.refresh-toggle.active .toggle-dot {
+  background: #2fa84f;
+  box-shadow: 0 0 0 5px rgba(47, 168, 79, 0.1);
+  animation: pulse 1.8s infinite;
+}
+
+
+/* =========================================================
+   TOP MONITORING CARDS
+   ========================================================= */
+
+.monitor-grid {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 20px;
+  margin-bottom: 38px;
+}
+
+.aqi-live-card,
+.device-live-card {
+  position: relative;
+  overflow: hidden;
+  background: white;
+  border: 1px solid #e7eee9;
+  border-radius: 22px;
+  padding: 25px;
+  box-shadow: 0 12px 35px rgba(35, 65, 45, 0.055);
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+  animation: cardRise 0.7s ease both;
+}
+
+.device-live-card {
+  animation-delay: 0.1s;
+}
+
+.aqi-live-card:hover,
+.device-live-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 45px rgba(35, 65, 45, 0.09);
+}
+
+.aqi-live-card::after {
+  content: "";
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  right: -90px;
+  top: -90px;
+  border-radius: 50%;
+  background: #effaf2;
+}
+
+
+/* =========================================================
+   CARD HEADING
+   ========================================================= */
+
+.card-heading {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.card-heading h2 {
+  margin: 5px 0 0;
+  font-size: 19px;
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   LIVE BADGE
+   ========================================================= */
+
+.live-badge,
+.online-dot {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: #effaf2;
+  color: #2fa84f;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.live-badge span,
+.online-dot span,
+.reading-status span {
+  width: 7px;
+  height: 7px;
+  background: #2fa84f;
+  border-radius: 50%;
+}
+
+.live-badge span {
+  animation: pulse 1.6s infinite;
+}
+
+
+/* =========================================================
+   AQI CONTENT
+   ========================================================= */
+
+.aqi-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  min-height: 190px;
+}
+
+.aqi-number {
+  margin-top: 18px;
+  font-size: 76px;
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: -4px;
+  color: #172033;
+  animation: numberPop 0.8s ease;
+}
+
+.aqi-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 8px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.aqi-status span {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+
+.aqi-status.good {
+  color: #2fa84f;
+}
+
+.aqi-status.good span {
+  background: #2fa84f;
+  box-shadow: 0 0 0 5px rgba(47, 168, 79, 0.09);
+}
+
+.aqi-status.moderate {
+  color: #d69b20;
+}
+
+.aqi-status.moderate span {
+  background: #e7ae35;
+}
+
+.aqi-status.danger {
+  color: #d85c5c;
+}
+
+.aqi-status.danger span {
+  background: #d85c5c;
+}
+
+.aqi-number-section p {
+  max-width: 280px;
+  margin: 10px 0 0;
+  color: #7b8494;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+
+/* =========================================================
+   AQI GAUGE
+   ========================================================= */
+
+.aqi-gauge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-right: 15px;
+}
+
+.gauge-ring {
+  --progress: 10%;
+
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background:
+    conic-gradient(
+      #2fa84f 0deg,
+      #70c980 35deg,
+      #e7b94d 80deg,
+      #ee9448 150deg,
+      #e05d5d 230deg,
+      #e9eeee 230deg
+    );
+
+  position: relative;
+  animation: gaugeAppear 1.2s ease;
+}
+
+.gauge-ring::before {
+  content: "";
+  position: absolute;
+  inset: 11px;
+  border-radius: 50%;
+  background: white;
+}
+
+.gauge-inner {
+  position: relative;
+  z-index: 2;
+  width: 105px;
+  height: 105px;
+  border-radius: 50%;
+  background: #f8fcf9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  color: #2fa84f;
+}
+
+.gauge-inner svg {
+  margin-bottom: 6px;
+}
+
+.gauge-inner span {
+  color: #7b8494;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+
+/* =========================================================
+   UPDATED
+   ========================================================= */
+
+.updated {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #99a2ad;
+  font-size: 11px;
+  border-top: 1px solid #edf1ee;
+  padding-top: 14px;
+}
+
+
+/* =========================================================
+   DEVICE CARD
+   ========================================================= */
+
+.device-visual {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 30px 0;
+}
+
+.device-icon {
+  width: 65px;
+  height: 65px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #eaf8ee;
+  color: #2fa84f;
+  animation: deviceFloat 3s ease-in-out infinite;
+}
+
+.device-visual strong {
+  display: block;
+  font-size: 18px;
+}
+
+.device-visual p {
+  margin: 5px 0 0;
+  color: #8a94a2;
+  font-size: 12px;
+}
+
+.device-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-top: 1px solid #edf1ee;
+  padding-top: 20px;
+}
+
+.device-stats div {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.device-stats span {
+  color: #929aa5;
+  font-size: 11px;
+}
+
+.device-stats strong {
+  font-size: 13px;
+  color: #2fa84f;
+}
+
+.device-stats div + div {
+  border-left: 1px solid #edf1ee;
+  padding-left: 16px;
+}
+
+
+/* =========================================================
+   SECTION HEADING
+   ========================================================= */
+
+.section-block {
+  margin-bottom: 38px;
+}
+
+.section-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 17px;
+}
+
+.section-heading h2 {
+  margin: 4px 0 0;
+  font-size: 21px;
+  letter-spacing: -0.4px;
+}
+
+.reading-status {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  color: #718079;
+}
+
+
+/* =========================================================
+   SENSOR GRID
+   ========================================================= */
+
+.sensor-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 15px;
+}
+
+.sensor-card {
+  position: relative;
+  overflow: hidden;
+  min-height: 185px;
+  padding: 19px;
+  border: 1px solid #e7eee9;
+  border-radius: 18px;
+  background: white;
+  box-shadow: 0 9px 25px rgba(35, 65, 45, 0.045);
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+  animation: cardRise 0.7s ease both;
+}
+
+.sensor-card:nth-child(2) {
+  animation-delay: 0.08s;
+}
+
+.sensor-card:nth-child(3) {
+  animation-delay: 0.16s;
+}
+
+.sensor-card:nth-child(4) {
+  animation-delay: 0.24s;
+}
+
+.sensor-card:nth-child(5) {
+  animation-delay: 0.32s;
+}
+
+.sensor-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 17px 35px rgba(35, 65, 45, 0.09);
+}
+
+.sensor-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sensor-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sensor-live {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  color: #2fa84f;
+}
+
+.sensor-card p {
+  margin: 17px 0 2px;
+  color: #98a1ad;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.sensor-card h3 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.sensor-value {
+  margin-top: 12px;
+  font-size: 27px;
+  font-weight: 800;
+}
+
+.sensor-value small {
+  color: #89929d;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.sensor-status {
+  margin-top: 4px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.sensor-status.good {
+  color: #2fa84f;
+}
+
+.sensor-status.comfortable {
+  color: #428ec5;
+}
+
+
+/* =========================================================
+   SENSOR ACCENTS
+   ========================================================= */
+
+.sensor-green .sensor-icon {
+  color: #2fa84f;
+  background: #eaf8ee;
+}
+
+.sensor-blue .sensor-icon {
+  color: #428ec5;
+  background: #edf7fd;
+}
+
+.sensor-purple .sensor-icon {
+  color: #8068c7;
+  background: #f3effc;
+}
+
+.sensor-orange .sensor-icon {
+  color: #df9142;
+  background: #fff4e8;
+}
+
+.sensor-cyan .sensor-icon {
+  color: #36a7ad;
+  background: #ebf9fa;
+}
+
+
+/* =========================================================
+   MINI SENSOR WAVE
+   ========================================================= */
+
+.mini-wave {
+  position: absolute;
+  bottom: 0;
+  left: -10%;
+  width: 120%;
+  height: 35px;
+  opacity: 0.5;
+  background:
+    linear-gradient(
+      135deg,
+      transparent 45%,
+      #ccebd4 46%,
+      #ccebd4 49%,
+      transparent 50%
+    );
+  background-size: 28px 28px;
+  animation: waveMove 3s linear infinite;
+}
+
+
+/* =========================================================
+   BOTTOM STATUS CARDS
+   ========================================================= */
+
+.bottom-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.status-card,
+.health-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  position: relative;
+  padding: 22px;
+  border-radius: 19px;
+  border: 1px solid #e3eee6;
+  background: white;
+  box-shadow: 0 10px 28px rgba(35, 65, 45, 0.045);
+  animation: cardRise 0.8s ease;
+}
+
+.status-icon,
+.health-icon {
+  flex-shrink: 0;
+  width: 52px;
+  height: 52px;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.status-icon {
+  color: #2fa84f;
+  background: #eaf8ee;
+}
+
+.health-icon {
+  color: #36a7ad;
+  background: #ebf9fa;
+}
+
+.status-card h2,
+.health-card h2 {
+  margin: 5px 0 4px;
+  font-size: 16px;
+}
+
+.status-card p,
+.health-card p {
+  margin: 0;
+  color: #84908a;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.status-pill {
+  margin-left: auto;
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: #eaf8ee;
+  color: #2fa84f;
+  font-size: 9px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+
+/* =========================================================
+   ANIMATIONS
+   ========================================================= */
+
+@keyframes fadeDown {
+  from {
+    opacity: 0;
+    transform: translateY(-15px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes cardRise {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes numberPop {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes gaugeAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.75) rotate(-30deg);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(47, 168, 79, 0.35);
+  }
+
+  70% {
+    box-shadow: 0 0 0 7px rgba(47, 168, 79, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(47, 168, 79, 0);
+  }
+}
+
+@keyframes deviceFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes waveMove {
+  from {
+    background-position: 0 0;
+  }
+
+  to {
+    background-position: 56px 0;
+  }
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1200px) {
+  .sensor-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .live-page {
+    padding: 24px;
+  }
+
+  .live-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .live-controls {
+    width: 100%;
+  }
+
+  .device-select,
+  .refresh-toggle {
+    flex: 1;
+  }
+
+  .monitor-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sensor-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .bottom-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .live-page {
+    padding: 16px;
+  }
+
+  .live-title h1 {
+    font-size: 25px;
+  }
+
+  .live-controls {
+    flex-direction: column;
+  }
+
+  .device-select,
+  .refresh-toggle {
+    width: 100%;
+  }
+
+  .aqi-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .aqi-gauge {
+    align-self: center;
+    padding: 0;
+  }
+
+  .sensor-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bottom-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .status-card,
+  .health-card {
+    align-items: flex-start;
+  }
+
+  .status-pill {
+    display: none;
+  }
+}
