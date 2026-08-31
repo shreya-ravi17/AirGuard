@@ -11,7 +11,7 @@ app = FastAPI(title="AirGuard API")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173/"],  # for development; restrict later if needed
+    allow_origins=["http://localhost:5173"],  # for development; restrict later if needed
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

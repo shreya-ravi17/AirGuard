@@ -11,7 +11,7 @@ import {
   Thermometer,
 } from "lucide-react";
 
-import { getCurrentAQI } from "../services/api";
+import { getCurrent } from "../services/api";
 import "./Dashboard.css";
 
 function Dashboard() {
@@ -35,6 +35,14 @@ function Dashboard() {
   const [error, setError] = useState("");
 
   const [menuOpen, setMenuOpen] = useState(false);
+
+  // =====================================================
+  // LOAD LATEST READING ON MOUNT
+  // =====================================================
+
+  useEffect(() => {
+    fetchAQI();
+  }, []);
 
   // =====================================================
   // GET USER LOCATION
@@ -68,8 +76,8 @@ function Dashboard() {
 
         setLocationLoading(false);
 
-        // Fetch AQI using this location
-        await fetchAQI(latitude, longitude);
+        // Fetch latest AQI reading from backend
+        await fetchAQI();
       },
       (locationError) => {
         console.error(
@@ -95,19 +103,12 @@ function Dashboard() {
   // FETCH AQI FROM BACKEND
   // =====================================================
 
-  const fetchAQI = async (latitude, longitude) => {
+  const fetchAQI = async () => {
     try {
       setLoading(true);
       setError("");
 
-      console.log("Sending location to backend:");
-      console.log("Latitude:", latitude);
-      console.log("Longitude:", longitude);
-
-      const data = await getCurrentAQI(
-        latitude,
-        longitude
-      );
+      const data = await getCurrent();
 
       console.log("Dashboard API data:", data);
 

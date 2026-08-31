@@ -4,3 +4,5 @@ ML/**/__pycache__/
 *.pyc
 .ipynb_checkpoints/
 ML/data/city_hour.csv
+backend/.env
+frontend/node_modules/
