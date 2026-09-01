@@ -490,7 +490,7 @@
 
 .sensor-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 15px;
 }
 
@@ -523,6 +523,10 @@
 
 .sensor-card:nth-child(5) {
   animation-delay: 0.32s;
+}
+
+.sensor-card:nth-child(6) {
+  animation-delay: 0.4s;
 }
 
 .sensor-card:hover {
@@ -609,6 +613,11 @@
 .sensor-purple .sensor-icon {
   color: #8068c7;
   background: #f3effc;
+}
+
+.sensor-teal .sensor-icon {
+  color: #2a9d8f;
+  background: #e8f7f4;
 }
 
 .sensor-orange .sensor-icon {

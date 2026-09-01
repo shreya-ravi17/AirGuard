@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 
 import {
@@ -12,7 +11,6 @@ import {
   Wind,
   Zap,
   AlertTriangle,
-  RefreshCw,
 } from "lucide-react";
 
 import "./LiveMonitoring.css";
@@ -20,240 +18,268 @@ import "./LiveMonitoring.css";
 import { getCurrent } from "../../services/api";
 
 
-// ==========================================
-// COMPONENT
-// ==========================================
-
 function LiveMonitoring() {
-  // ========================================
+
+  // ==========================================
   // STATE
-  // ========================================
+  // ==========================================
 
   const [aqi, setAqi] = useState(0);
-  const [aqiCategory, setAqiCategory] = useState("");
 
   const [temperature, setTemperature] = useState(0);
+
   const [humidity, setHumidity] = useState(0);
 
   const [co, setCo] = useState(0);
+
   const [nh3, setNh3] = useState(0);
+
   const [no2, setNo2] = useState(0);
+
   const [nox, setNox] = useState(0);
 
-  const [city, setCity] = useState("");
-  const [deviceId, setDeviceId] = useState("");
-
   const [loading, setLoading] = useState(true);
+
   const [error, setError] = useState("");
-  const [lastUpdated, setLastUpdated] = useState("");
 
-  const [autoRefresh, setAutoRefresh] = useState(true);
+  const [lastUpdated, setLastUpdated] =
+    useState("");
 
 
-  // ========================================
+  // ==========================================
   // AQI STATUS
-  // ========================================
+  // ==========================================
 
-  const getAQIStatus = (value, backendCategory) => {
-    const number = Number(value) || 0;
+  const getAQIStatus = (value) => {
 
-    // Prefer the category coming from backend
-    if (backendCategory) {
-      const category = backendCategory.toLowerCase();
+    const currentAQI = Number(value) || 0;
 
-      if (category.includes("good") || category.includes("safe")) {
-        return {
-          text: backendCategory,
-          className: "good",
-          description: "Air quality is currently good.",
-        };
-      }
-
-      if (category.includes("moderate")) {
-        return {
-          text: backendCategory,
-          className: "moderate",
-          description:
-            "Air quality is acceptable but may affect sensitive people.",
-        };
-      }
-
-      if (
-        category.includes("unhealthy") ||
-        category.includes("danger") ||
-        category.includes("hazard")
-      ) {
-        return {
-          text: backendCategory,
-          className: "danger",
-          description:
-            "Air quality needs attention. Consider reducing exposure.",
-        };
-      }
-    }
-
-    // Fallback based on AQI value
-    if (number <= 50) {
+    if (currentAQI <= 50) {
       return {
         text: "Good",
         className: "good",
-        description: "Air quality is currently good.",
       };
     }
 
-    if (number <= 100) {
+    if (currentAQI <= 100) {
       return {
         text: "Moderate",
         className: "moderate",
-        description:
-          "Air quality is acceptable but may affect sensitive people.",
       };
     }
 
-    if (number <= 150) {
-      return {
-        text: "Unhealthy for Sensitive Groups",
-        className: "moderate",
-        description:
-          "Sensitive people may experience health effects.",
-      };
-    }
-
-    if (number <= 200) {
+    if (currentAQI <= 200) {
       return {
         text: "Unhealthy",
         className: "danger",
-        description:
-          "Everyone may begin to experience health effects.",
       };
     }
 
     return {
-      text: "Hazardous",
+      text: "Very Unhealthy",
       className: "danger",
-      description: "Air quality is at a hazardous level.",
     };
   };
 
 
-  // ========================================
-  // LOAD CURRENT DATA
-  // GET /api/current
-  // ========================================
+  // ==========================================
+  // LOAD CURRENT DATA FROM BACKEND
+  // ==========================================
 
   const loadCurrentData = async () => {
+
     try {
+
       setError("");
 
       const data = await getCurrent();
 
-      console.log("AirGuard /api/current:", data);
-
-      // ====================================
-      // HANDLE POSSIBLE API WRAPPER
-      // ====================================
-
-      const current =
-        data?.data ||
-        data?.current ||
-        data;
+      console.log(
+        "LIVE MONITORING - BACKEND DATA:",
+        data
+      );
 
 
-      // ====================================
-      // ACTUAL BACKEND FIELDS
-      // ====================================
+      // ========================================
+      // AQI
+      // ========================================
 
-      setAqi(Number(current?.aqi_value) || 0);
+      const currentAQI =
+        data?.aqi ??
+        data?.AQI ??
+        data?.aqi_value ??
+        data?.current_aqi ??
+        data?.predicted_aqi ??
+        0;
 
-      setAqiCategory(current?.aqi_category || "");
-
-      setTemperature(Number(current?.temperature) || 0);
-
-      setHumidity(Number(current?.humidity) || 0);
-
-      setCo(Number(current?.co) || 0);
-
-      setNh3(Number(current?.nh3) || 0);
-
-      setNo2(Number(current?.no2) || 0);
-
-      setNox(Number(current?.nox) || 0);
-
-      setCity(current?.city || "");
-
-      setDeviceId(current?.device_id || "");
+      setAqi(
+        Number(currentAQI) || 0
+      );
 
 
-      // ====================================
+      // ========================================
+      // TEMPERATURE
+      // ========================================
+
+      const currentTemperature =
+        data?.temperature ??
+        data?.temp ??
+        data?.Temperature ??
+        0;
+
+      setTemperature(
+        Number(currentTemperature) || 0
+      );
+
+
+      // ========================================
+      // HUMIDITY
+      // ========================================
+
+      const currentHumidity =
+        data?.humidity ??
+        data?.Humidity ??
+        0;
+
+      setHumidity(
+        Number(currentHumidity) || 0
+      );
+
+
+      // ========================================
+      // CO (Carbon Monoxide)
+      // ========================================
+
+      const currentCO =
+        data?.co ??
+        data?.CO ??
+        0;
+
+      setCo(
+        Number(currentCO) || 0
+      );
+
+
+      // ========================================
+      // NH3 (Ammonia)
+      // ========================================
+
+      const currentNH3 =
+        data?.nh3 ??
+        data?.NH3 ??
+        0;
+
+      setNh3(
+        Number(currentNH3) || 0
+      );
+
+
+      // ========================================
+      // NO2 (Nitrogen Dioxide)
+      // ========================================
+
+      const currentNO2 =
+        data?.no2 ??
+        data?.NO2 ??
+        0;
+
+      setNo2(
+        Number(currentNO2) || 0
+      );
+
+
+      // ========================================
+      // NOx (Nitrogen Oxides)
+      // ========================================
+
+      const currentNOx =
+        data?.nox ??
+        data?.NOx ??
+        data?.NOX ??
+        0;
+
+      setNox(
+        Number(currentNOx) || 0
+      );
+
+
+      // ========================================
       // LAST UPDATED
-      // ====================================
-
-      const timestamp = current?.timestamp;
+      // ========================================
 
       setLastUpdated(
-        timestamp
-          ? new Date(timestamp).toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit",
-              second: "2-digit",
-            })
-          : new Date().toLocaleTimeString([], {
-              hour: "2-digit",
-              minute: "2-digit",
-              second: "2-digit",
-            })
+        new Date().toLocaleTimeString(
+          [],
+          {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+          }
+        )
       );
+
     } catch (err) {
-      console.error("Live monitoring error:", err);
+
+      console.error(
+        "Live monitoring API error:",
+        err
+      );
 
       setError(
         err.message ||
-          "Failed to fetch live sensor data."
+        "Unable to fetch live sensor data."
       );
+
     } finally {
+
       setLoading(false);
+
     }
+
   };
 
 
-  // ========================================
-  // INITIAL LOAD + AUTO REFRESH
-  // ========================================
+  // ==========================================
+  // LOAD DATA WHEN PAGE OPENS
+  // REFRESH EVERY 5 SECONDS
+  // ==========================================
 
   useEffect(() => {
+
     loadCurrentData();
 
-    if (!autoRefresh) {
-      return;
-    }
-
-    const interval = setInterval(() => {
-      loadCurrentData();
-    }, 5000);
+    const interval = setInterval(
+      loadCurrentData,
+      5000
+    );
 
     return () => {
       clearInterval(interval);
     };
-  }, [autoRefresh]);
+
+  }, []);
 
 
-  // ========================================
+  // ==========================================
   // AQI STATUS
-  // ========================================
+  // ==========================================
 
-  const status = getAQIStatus(aqi, aqiCategory);
+  const status =
+    getAQIStatus(aqi);
 
 
-  // ========================================
+  // ==========================================
   // RENDER
-  // ========================================
+  // ==========================================
 
   return (
+
     <div className="live-page">
 
-      {/* ====================================
+
+      {/* ======================================
           PAGE HEADER
-      ==================================== */}
+      ====================================== */}
 
       <section className="live-header">
 
@@ -274,46 +300,29 @@ function LiveMonitoring() {
             </h1>
 
             <p>
-              Real-time environmental data
-              from your AirGuard device.
+              Real-time environmental data from
+              your AirGuard device.
             </p>
 
           </div>
 
         </div>
 
-
-        {/* REFRESH CONTROL */}
-
-        <button
-          onClick={loadCurrentData}
-          disabled={loading}
-          className="generate-button"
-        >
-
-          <RefreshCw
-            size={17}
-            className={
-              loading ? "spin" : ""
-            }
-          />
-
-          {loading
-            ? "Loading..."
-            : "Refresh"}
-
-        </button>
-
       </section>
 
 
-      {/* ====================================
-          ERROR
-      ==================================== */}
+      {/* ======================================
+          ERROR MESSAGE
+      ====================================== */}
 
       {error && (
 
-        <div className="prediction-error">
+        <div
+          className="prediction-error"
+          style={{
+            marginBottom: "20px",
+          }}
+        >
 
           <AlertTriangle size={18} />
 
@@ -326,16 +335,16 @@ function LiveMonitoring() {
       )}
 
 
-      {/* ====================================
+      {/* ======================================
           TOP CARDS
-      ==================================== */}
+      ====================================== */}
 
       <section className="monitor-grid">
 
 
-        {/* ==================================
+        {/* ====================================
             AQI CARD
-        ================================== */}
+        ==================================== */}
 
         <div className="aqi-live-card">
 
@@ -353,7 +362,6 @@ function LiveMonitoring() {
 
             </div>
 
-
             <div className="live-badge">
 
               <span></span>
@@ -367,6 +375,8 @@ function LiveMonitoring() {
 
           <div className="aqi-content">
 
+
+            {/* AQI VALUE */}
 
             <div className="aqi-number-section">
 
@@ -395,15 +405,21 @@ function LiveMonitoring() {
               <p>
 
                 {loading
-                  ? "Fetching current air quality..."
-                  : status.description}
+                  ? "Fetching live air quality data..."
+                  : aqi <= 50
+                  ? "Air quality is currently within a comfortable range."
+                  : aqi <= 100
+                  ? "Air quality is acceptable, but sensitive people should take care."
+                  : "Air quality is currently above the recommended range."}
 
               </p>
 
             </div>
 
 
-            {/* GAUGE */}
+            {/* ==================================
+                GAUGE
+            ================================== */}
 
             <div className="aqi-gauge">
 
@@ -438,21 +454,18 @@ function LiveMonitoring() {
 
             <Radio size={15} />
 
-            Last updated:
-
-            {" "}
-
-            {lastUpdated ||
-              "Loading..."}
+            {loading
+              ? "Connecting..."
+              : `Last updated ${lastUpdated}`}
 
           </div>
 
         </div>
 
 
-        {/* ==================================
+        {/* ====================================
             DEVICE CARD
-        ================================== */}
+        ==================================== */}
 
         <div className="device-live-card">
 
@@ -465,7 +478,6 @@ function LiveMonitoring() {
               </span>
 
             </div>
-
 
             <div className="online-dot">
 
@@ -486,7 +498,6 @@ function LiveMonitoring() {
 
             </div>
 
-
             <div>
 
               <strong>
@@ -494,8 +505,7 @@ function LiveMonitoring() {
               </strong>
 
               <p>
-                {deviceId ||
-                  "ESP32 Air Quality Device"}
+                ESP32 Air Quality Device
               </p>
 
             </div>
@@ -508,24 +518,23 @@ function LiveMonitoring() {
             <div>
 
               <span>
-                Location
+                Connection
               </span>
 
               <strong>
-                {city || "Unknown"}
+                API Connected
               </strong>
 
             </div>
 
-
             <div>
 
               <span>
-                Refresh
+                Refresh Rate
               </span>
 
               <strong>
-                {autoRefresh ? "5 sec" : "Off"}
+                5 seconds
               </strong>
 
             </div>
@@ -537,11 +546,12 @@ function LiveMonitoring() {
       </section>
 
 
-      {/* ====================================
+      {/* ======================================
           SENSOR SECTION
-      ==================================== */}
+      ====================================== */}
 
       <section className="section-block">
+
 
         <div className="section-heading">
 
@@ -562,9 +572,7 @@ function LiveMonitoring() {
 
             <span></span>
 
-            {error
-              ? "Connection error"
-              : loading
+            {loading
               ? "Connecting..."
               : "Receiving data"}
 
@@ -576,9 +584,9 @@ function LiveMonitoring() {
         <div className="sensor-grid">
 
 
-          {/* =================================
+          {/* ==================================
               CO
-          ================================= */}
+          ================================== */}
 
           <div className="sensor-card sensor-green">
 
@@ -598,7 +606,7 @@ function LiveMonitoring() {
 
 
             <p>
-              MQ-7
+              GAS
             </p>
 
             <h3>
@@ -610,7 +618,7 @@ function LiveMonitoring() {
 
               {loading
                 ? "..."
-                : co}
+                : Number(co).toFixed(2)}
 
               <small>
                 {" "}ppm
@@ -620,7 +628,9 @@ function LiveMonitoring() {
 
 
             <div className="sensor-status good">
-              ● Live
+
+              ● Safe
+
             </div>
 
 
@@ -629,9 +639,9 @@ function LiveMonitoring() {
           </div>
 
 
-          {/* =================================
+          {/* ==================================
               NH3
-          ================================= */}
+          ================================== */}
 
           <div className="sensor-card sensor-blue">
 
@@ -651,7 +661,7 @@ function LiveMonitoring() {
 
 
             <p>
-              MQ Sensor
+              GAS
             </p>
 
             <h3>
@@ -663,7 +673,7 @@ function LiveMonitoring() {
 
               {loading
                 ? "..."
-                : nh3}
+                : Number(nh3).toFixed(2)}
 
               <small>
                 {" "}ppm
@@ -673,7 +683,9 @@ function LiveMonitoring() {
 
 
             <div className="sensor-status good">
-              ● Live
+
+              ● Good
+
             </div>
 
 
@@ -682,9 +694,9 @@ function LiveMonitoring() {
           </div>
 
 
-          {/* =================================
+          {/* ==================================
               NO2
-          ================================= */}
+          ================================== */}
 
           <div className="sensor-card sensor-purple">
 
@@ -704,11 +716,11 @@ function LiveMonitoring() {
 
 
             <p>
-              MQ Sensor
+              GAS
             </p>
 
             <h3>
-              Nitrogen Dioxide
+              Nitrogen Dioxide (NO₂)
             </h3>
 
 
@@ -716,7 +728,7 @@ function LiveMonitoring() {
 
               {loading
                 ? "..."
-                : no2}
+                : Number(no2).toFixed(2)}
 
               <small>
                 {" "}ppm
@@ -726,7 +738,9 @@ function LiveMonitoring() {
 
 
             <div className="sensor-status good">
-              ● Live
+
+              ● Good
+
             </div>
 
 
@@ -735,17 +749,17 @@ function LiveMonitoring() {
           </div>
 
 
-          {/* =================================
-              NOX
-          ================================= */}
+          {/* ==================================
+              NOx
+          ================================== */}
 
-          <div className="sensor-card sensor-green">
+          <div className="sensor-card sensor-teal">
 
             <div className="sensor-top">
 
               <div className="sensor-icon">
 
-                <Wind size={21} />
+                <Gauge size={21} />
 
               </div>
 
@@ -757,11 +771,11 @@ function LiveMonitoring() {
 
 
             <p>
-              MQ Sensor
+              GAS
             </p>
 
             <h3>
-              Nitrogen Oxides
+              Nitrogen Oxides (NOx)
             </h3>
 
 
@@ -769,7 +783,7 @@ function LiveMonitoring() {
 
               {loading
                 ? "..."
-                : nox}
+                : Number(nox).toFixed(2)}
 
               <small>
                 {" "}ppm
@@ -779,7 +793,9 @@ function LiveMonitoring() {
 
 
             <div className="sensor-status good">
-              ● Live
+
+              ● Good
+
             </div>
 
 
@@ -788,9 +804,9 @@ function LiveMonitoring() {
           </div>
 
 
-          {/* =================================
+          {/* ==================================
               TEMPERATURE
-          ================================= */}
+          ================================== */}
 
           <div className="sensor-card sensor-orange">
 
@@ -822,7 +838,7 @@ function LiveMonitoring() {
 
               {loading
                 ? "..."
-                : temperature.toFixed(1)}
+                : Number(temperature).toFixed(1)}
 
               <small>
                 {" "}°C
@@ -832,7 +848,9 @@ function LiveMonitoring() {
 
 
             <div className="sensor-status comfortable">
-              ● Live
+
+              ● Comfortable
+
             </div>
 
 
@@ -841,9 +859,9 @@ function LiveMonitoring() {
           </div>
 
 
-          {/* =================================
+          {/* ==================================
               HUMIDITY
-          ================================= */}
+          ================================== */}
 
           <div className="sensor-card sensor-cyan">
 
@@ -875,7 +893,7 @@ function LiveMonitoring() {
 
               {loading
                 ? "..."
-                : humidity.toFixed(0)}
+                : Number(humidity).toFixed(0)}
 
               <small>
                 {" "}%
@@ -885,7 +903,9 @@ function LiveMonitoring() {
 
 
             <div className="sensor-status comfortable">
-              ● Live
+
+              ● Comfortable
+
             </div>
 
 
@@ -893,17 +913,20 @@ function LiveMonitoring() {
 
           </div>
 
+
         </div>
 
       </section>
 
 
-      {/* ====================================
+      {/* ======================================
           BOTTOM INSIGHTS
-      ==================================== */}
+      ====================================== */}
 
       <section className="bottom-grid">
 
+
+        {/* STATUS CARD */}
 
         <div className="status-card">
 
@@ -932,12 +955,15 @@ function LiveMonitoring() {
 
             </h2>
 
-
             <p>
 
               {loading
-                ? "Fetching the latest sensor readings."
-                : status.description}
+                ? "Waiting for live sensor data."
+                : aqi <= 50
+                ? "Your surrounding air is currently within safe limits."
+                : aqi <= 100
+                ? "Some sensitive individuals may need to take precautions."
+                : "Consider reducing exposure to the current air conditions."}
 
             </p>
 
@@ -951,13 +977,15 @@ function LiveMonitoring() {
               : aqi <= 50
               ? "LOW RISK"
               : aqi <= 100
-              ? "MODERATE"
+              ? "MODERATE RISK"
               : "HIGH RISK"}
 
           </div>
 
         </div>
 
+
+        {/* INSIGHT CARD */}
 
         <div className="health-card">
 
@@ -974,16 +1002,15 @@ function LiveMonitoring() {
               AIRGUARD INSIGHT
             </span>
 
-
             <h2>
 
               {loading
-                ? "Analyzing conditions..."
+                ? "Reading environment..."
                 : aqi <= 50
                 ? "Comfortable conditions 🌿"
                 : aqi <= 100
                 ? "Moderate conditions"
-                : "Consider reducing exposure"}
+                : "Take precautions"}
 
             </h2>
 
@@ -991,14 +1018,14 @@ function LiveMonitoring() {
             <p>
 
               {loading
-                ? "Your device data is being analyzed."
+                ? "AirGuard is receiving your sensor readings."
                 : `Current AQI is ${Math.round(
                     aqi
-                  )}, with temperature ${temperature.toFixed(
-                    1
-                  )}°C and humidity ${humidity.toFixed(
-                    0
-                  )}%.`}
+                  )}. Temperature is ${Number(
+                    temperature
+                  ).toFixed(1)}°C and humidity is ${Number(
+                    humidity
+                  ).toFixed(0)}%.`}
 
             </p>
 
@@ -1009,7 +1036,9 @@ function LiveMonitoring() {
       </section>
 
     </div>
+
   );
+
 }
 
 

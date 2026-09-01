@@ -1,5 +1,5 @@
 import sys, os
-SRC_PATH = os.path.join(os.path.dirname(__file__), '..', '..', 'src')
+SRC_PATH = os.path.join(os.path.dirname(__file__), '..', '..', 'ML', 'src')
 sys.path.append(SRC_PATH)
 
 from predict import predict_aqi

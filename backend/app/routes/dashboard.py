@@ -30,6 +30,10 @@ def get_current_aqi(db: Session = Depends(get_db)):
         "timestamp": latest.timestamp,
         "temperature": latest.temperature,
         "humidity": latest.humidity,
+        "co": latest.co,
+        "nh3": latest.nh3,
+        "no2": latest.no2,
+        "nox": latest.nox,
         "recommendation": get_recommendation(latest.aqi_category),
     }
 
