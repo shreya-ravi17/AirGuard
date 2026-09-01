@@ -629,44 +629,7 @@ function Dashboard() {
             </div>
 
           </div>
-
-          {/* DEVICE STATUS */}
-
-          <div className="environment-card">
-
-            <div className="environment-icon">
-
-              <Activity size={18} />
-
-            </div>
-
-            <div>
-
-              <span>
-                Device Status
-              </span>
-
-              <strong
-                className={
-                  error
-                    ? "offline"
-                    : "connected"
-                }
-              >
-
-                {error
-                  ? "Disconnected"
-                  : loading
-                  ? "Checking..."
-                  : "Connected"}
-
-              </strong>
-
-            </div>
-
-          </div>
-
-        </section>
+</section>
 
         {/* =================================================
             ERROR MESSAGE

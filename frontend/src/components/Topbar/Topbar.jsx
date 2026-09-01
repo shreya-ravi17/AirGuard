@@ -1,4 +1,3 @@
-
 import {
   Menu,
   Bell,
@@ -180,32 +179,6 @@ function Topbar({ setIsOpen }) {
         <div className="topbar-divider"></div>
 
 
-        {/* =================================================
-            PROFILE
-        ================================================= */}
-
-        <button className="profile-button">
-
-          <div className="profile-avatar">
-            S
-          </div>
-
-          <div className="profile-info">
-
-            <strong>
-              Spoorti
-            </strong>
-
-            <span>
-              AirGuard User
-            </span>
-
-          </div>
-
-          <ChevronDown size={15} />
-
-        </button>
-
       </div>
 
     </header>
@@ -213,4 +186,3 @@ function Topbar({ setIsOpen }) {
 }
 
 export default Topbar;
-

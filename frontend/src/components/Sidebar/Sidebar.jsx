@@ -144,27 +144,7 @@ function Sidebar({ isOpen, setIsOpen }) {
 
         {/* ================= DEVICE ================= */}
 
-        <div className="sidebar-bottom">
-
-          <div className="device-mini-card">
-
-            <div className="device-status-dot"></div>
-
-            <div>
-
-              <strong>
-                AirGuard Device
-              </strong>
-
-              <span>
-                Connected
-              </span>
-
-            </div>
-
-          </div>
-
-        </div>
+       
 
       </aside>
 

@@ -4,11 +4,6 @@ import {
   CalendarDays,
   Download,
   ChevronDown,
-  Wind,
-  TrendingUp,
-  TrendingDown,
-  BarChart3,
-  Clock3,
   RefreshCw,
 } from "lucide-react";
 
@@ -23,8 +18,6 @@ import {
   PieChart,
   Pie,
   Cell,
-  BarChart,
-  Bar,
 } from "recharts";
 
 import "./Analytics.css";
@@ -33,7 +26,6 @@ import {
   getStats,
   getTrend,
 } from "../../services/api";
-
 
 // ==========================================
 // COLORS
@@ -46,7 +38,6 @@ const COLORS = [
   "#df3943",
   "#8e55b7",
 ];
-
 
 // ==========================================
 // AQI STATUS
@@ -74,7 +65,6 @@ function getAQIStatus(aqi) {
   return "Severe";
 }
 
-
 // ==========================================
 // FORMAT DATE
 // ==========================================
@@ -93,7 +83,6 @@ function formatDate(value) {
     day: "numeric",
   });
 }
-
 
 // ==========================================
 // FORMAT TIME
@@ -114,25 +103,19 @@ function formatTime(value) {
   });
 }
 
-
 // ==========================================
 // COMPONENT
 // ==========================================
 
 function Analytics() {
-
   // ========================================
   // STATE
   // ========================================
 
   const [period, setPeriod] = useState("Daily");
 
-  const [dateRange, setDateRange] = useState(
-    "Last 7 Days"
-  );
-
-  const [timeFilter, setTimeFilter] =
-    useState("AQI");
+  const [dateRange, setDateRange] =
+    useState("Last 7 Days");
 
   const [stats, setStats] = useState(null);
 
@@ -145,15 +128,12 @@ function Analytics() {
   const [lastUpdated, setLastUpdated] =
     useState(null);
 
-
   // ========================================
   // LOAD ANALYTICS DATA
   // ========================================
 
   const loadAnalytics = async () => {
-
     try {
-
       setLoading(true);
       setError("");
 
@@ -163,48 +143,45 @@ function Analytics() {
           getTrend(),
         ]);
 
-      console.log("Analytics Stats:", statsData);
-      console.log("Analytics Trend:", trendData);
+      console.log(
+        "Analytics Stats:",
+        statsData
+      );
+
+      console.log(
+        "Analytics Trend:",
+        trendData
+      );
 
       setStats(statsData);
 
       // Backend may return array directly
       if (Array.isArray(trendData)) {
-
         setTrend(trendData);
-
       }
 
-      // Backend may return {trend: [...]}
+      // Backend may return { trend: [...] }
       else if (
         Array.isArray(trendData?.trend)
       ) {
-
         setTrend(trendData.trend);
-
       }
 
-      // Backend may return {data: [...]}
+      // Backend may return { data: [...] }
       else if (
         Array.isArray(trendData?.data)
       ) {
-
         setTrend(trendData.data);
-
       }
 
       else {
-
         setTrend([]);
-
       }
 
       setLastUpdated(new Date());
-
     }
 
     catch (err) {
-
       console.error(
         "Analytics API error:",
         err
@@ -214,41 +191,31 @@ function Analytics() {
         err.message ||
         "Unable to load analytics data."
       );
-
     }
 
     finally {
-
       setLoading(false);
-
     }
-
   };
-
 
   // ========================================
   // LOAD WHEN PAGE OPENS
   // ========================================
 
   useEffect(() => {
-
     loadAnalytics();
-
   }, []);
-
 
   // ========================================
   // NORMALIZE TREND DATA
   // ========================================
 
   const normalizedTrend = useMemo(() => {
-
     if (!Array.isArray(trend)) {
       return [];
     }
 
     return trend.map((item, index) => {
-
       const aqi =
         item?.aqi ??
         item?.aqi_value ??
@@ -264,7 +231,6 @@ function Analytics() {
         "";
 
       return {
-
         ...item,
 
         aqi: Number(aqi) || 0,
@@ -284,51 +250,46 @@ function Analytics() {
         date:
           item?.date ||
           timestamp,
-
       };
-
     });
-
   }, [trend]);
-
 
   // ========================================
   // PERIOD DATA
   // ========================================
 
   const trendData = useMemo(() => {
-
     if (normalizedTrend.length === 0) {
       return [];
     }
 
     // DAILY
     if (period === "Daily") {
-
       return normalizedTrend.map(
         (item) => ({
           ...item,
+
           label:
             item.day ||
             formatDate(item.timestamp),
         })
       );
-
     }
-
 
     // WEEKLY
     if (period === "Weekly") {
-
       const weeks = {};
 
       normalizedTrend.forEach((item) => {
-
         const date = new Date(
           item.timestamp
         );
 
-        if (Number.isNaN(date.getTime())) {
+        if (
+          Number.isNaN(
+            date.getTime()
+          )
+        ) {
           return;
         }
 
@@ -346,7 +307,9 @@ function Analytics() {
 
         const week =
           Math.ceil(
-            (days + firstDay.getDay() + 1) /
+            (days +
+              firstDay.getDay() +
+              1) /
               7
           );
 
@@ -354,44 +317,45 @@ function Analytics() {
           `${year}-W${week}`;
 
         if (!weeks[key]) {
-
           weeks[key] = {
             day: `Week ${week}`,
             total: 0,
             count: 0,
           };
-
         }
 
-        weeks[key].total += item.aqi;
-        weeks[key].count += 1;
+        weeks[key].total +=
+          item.aqi;
 
+        weeks[key].count += 1;
       });
 
-      return Object.values(weeks).map(
-        (item) => ({
-          day: item.day,
-          aqi: Math.round(
-            item.total / item.count
-          ),
-        })
-      );
+      return Object.values(
+        weeks
+      ).map((item) => ({
+        day: item.day,
 
+        aqi: Math.round(
+          item.total /
+            item.count
+        ),
+      }));
     }
-
 
     // MONTHLY
     if (period === "Monthly") {
-
       const months = {};
 
       normalizedTrend.forEach((item) => {
-
         const date = new Date(
           item.timestamp
         );
 
-        if (Number.isNaN(date.getTime())) {
+        if (
+          Number.isNaN(
+            date.getTime()
+          )
+        ) {
           return;
         }
 
@@ -399,101 +363,57 @@ function Analytics() {
           `${date.getFullYear()}-${date.getMonth()}`;
 
         if (!months[key]) {
-
           months[key] = {
-            day: date.toLocaleDateString(
-              "en-IN",
-              { month: "short" }
-            ),
+            day:
+              date.toLocaleDateString(
+                "en-IN",
+                {
+                  month: "short",
+                }
+              ),
+
             total: 0,
+
             count: 0,
           };
-
         }
 
-        months[key].total += item.aqi;
-        months[key].count += 1;
+        months[key].total +=
+          item.aqi;
 
+        months[key].count += 1;
       });
 
-      return Object.values(months).map(
-        (item) => ({
-          day: item.day,
-          aqi: Math.round(
-            item.total / item.count
-          ),
-        })
-      );
+      return Object.values(
+        months
+      ).map((item) => ({
+        day: item.day,
 
+        aqi: Math.round(
+          item.total /
+            item.count
+        ),
+      }));
     }
 
     return normalizedTrend;
-
-  }, [normalizedTrend, period]);
-
-
-  // ========================================
-  // GET STAT VALUE
-  // ========================================
-
-  const averageAQI =
-    Number(
-      stats?.average_aqi ??
-      stats?.avg_aqi ??
-      stats?.average ??
-      stats?.mean_aqi ??
-      0
-    );
-
-  const maxAQI =
-    Number(
-      stats?.max_aqi ??
-      stats?.maximum_aqi ??
-      stats?.max ??
-      0
-    );
-
-  const minAQI =
-    Number(
-      stats?.min_aqi ??
-      stats?.minimum_aqi ??
-      stats?.min ??
-      0
-    );
-
-  const totalReadings =
-    Number(
-      stats?.total_readings ??
-      stats?.readings ??
-      stats?.count ??
-      trend.length ??
-      0
-    );
-
-
-  // ========================================
-  // DATA AVAILABILITY
-  // ========================================
-
-  const availability =
-    Number(
-      stats?.data_availability ??
-      stats?.availability ??
-      99
-    );
-
+  }, [
+    normalizedTrend,
+    period,
+  ]);
 
   // ========================================
   // DISTRIBUTION
   // ========================================
 
   const distributionData = useMemo(() => {
-
+    // Use distribution returned by backend
     if (
       stats?.distribution &&
-      Array.isArray(stats.distribution)
+      Array.isArray(
+        stats.distribution
+      )
     ) {
-
       return stats.distribution.map(
         (item) => ({
           name:
@@ -501,48 +421,49 @@ function Analytics() {
             item.category ||
             "Unknown",
 
-          value:
-            Number(
-              item.value ??
-              item.percentage ??
-              0
-            ),
+          value: Number(
+            item.value ??
+            item.percentage ??
+            0
+          ),
         })
       );
-
     }
 
-
-    const total =
-      normalizedTrend.length;
-
-    if (total === 0) {
-
+    // If there is no trend data
+    if (
+      normalizedTrend.length === 0
+    ) {
       return [
         {
           name: "Good (0-100)",
           value: 0,
         },
+
         {
           name: "Moderate (101-200)",
           value: 0,
         },
+
         {
           name: "Poor (201-300)",
           value: 0,
         },
+
         {
           name: "Very Poor (301-400)",
           value: 0,
         },
+
         {
           name: "Severe (401+)",
           value: 0,
         },
       ];
-
     }
 
+    const total =
+      normalizedTrend.length;
 
     let good = 0;
     let moderate = 0;
@@ -550,42 +471,46 @@ function Analytics() {
     let veryPoor = 0;
     let severe = 0;
 
-
     normalizedTrend.forEach(
       (item) => {
-
-        const value = item.aqi;
+        const value =
+          item.aqi;
 
         if (value <= 100) {
           good++;
         }
+
         else if (value <= 200) {
           moderate++;
         }
+
         else if (value <= 300) {
           poor++;
         }
+
         else if (value <= 400) {
           veryPoor++;
         }
+
         else {
           severe++;
         }
-
       }
     );
-
 
     return [
       {
         name: "Good (0-100)",
+
         value: Math.round(
           (good / total) * 100
         ),
       },
 
       {
-        name: "Moderate (101-200)",
+        name:
+          "Moderate (101-200)",
+
         value: Math.round(
           (moderate / total) * 100
         ),
@@ -593,13 +518,16 @@ function Analytics() {
 
       {
         name: "Poor (201-300)",
+
         value: Math.round(
           (poor / total) * 100
         ),
       },
 
       {
-        name: "Very Poor (301-400)",
+        name:
+          "Very Poor (301-400)",
+
         value: Math.round(
           (veryPoor / total) * 100
         ),
@@ -607,119 +535,31 @@ function Analytics() {
 
       {
         name: "Severe (401+)",
+
         value: Math.round(
           (severe / total) * 100
         ),
       },
     ];
-
-  }, [stats, normalizedTrend]);
-
-
-  // ========================================
-  // TODAY HOURLY DATA
-  // ========================================
-
-  const timeData = useMemo(() => {
-
-    return normalizedTrend.map(
-      (item) => ({
-        time:
-          item.time ||
-          formatTime(item.timestamp),
-
-        aqi: item.aqi,
-      })
-    );
-
-  }, [normalizedTrend]);
-
-
-  // ========================================
-  // INSIGHTS
-  // ========================================
-
-  const highestReading =
-    normalizedTrend.length > 0
-      ? normalizedTrend.reduce(
-          (max, item) =>
-            item.aqi > max.aqi
-              ? item
-              : max,
-          normalizedTrend[0]
-        )
-      : null;
-
-
-  const lowestReading =
-    normalizedTrend.length > 0
-      ? normalizedTrend.reduce(
-          (min, item) =>
-            item.aqi < min.aqi
-              ? item
-              : min,
-          normalizedTrend[0]
-        )
-      : null;
-
-
-  const firstReading =
-    normalizedTrend.length > 0
-      ? normalizedTrend[0].aqi
-      : 0;
-
-  const lastReading =
-    normalizedTrend.length > 0
-      ? normalizedTrend[
-          normalizedTrend.length - 1
-        ].aqi
-      : 0;
-
-
-  let trendDirection = "stable";
-
-  let trendPercentage = 0;
-
-
-  if (
-    firstReading > 0 &&
-    normalizedTrend.length >= 2
-  ) {
-
-    trendPercentage = Math.round(
-      Math.abs(
-        ((lastReading - firstReading) /
-          firstReading) *
-          100
-      )
-    );
-
-    if (lastReading > firstReading) {
-      trendDirection = "up";
-    }
-    else if (lastReading < firstReading) {
-      trendDirection = "down";
-    }
-
-  }
-
+  }, [
+    stats,
+    normalizedTrend,
+  ]);
 
   // ========================================
   // EXPORT REPORT
   // ========================================
 
   const exportReport = () => {
-
-    if (trendData.length === 0) {
-
+    if (
+      trendData.length === 0
+    ) {
       alert(
         "No analytics data available to export."
       );
 
       return;
-
     }
-
 
     const headers = [
       "Date / Period",
@@ -727,66 +567,70 @@ function Analytics() {
       "Status",
     ];
 
-
-    const rows = trendData.map(
-      (item) => [
-        `"${item.day || item.time || ""}"`,
-        item.aqi,
-        getAQIStatus(item.aqi),
-      ]
-    );
-
+    const rows =
+      trendData.map(
+        (item) => [
+          `"${item.day || item.time || ""}"`,
+          item.aqi,
+          getAQIStatus(
+            item.aqi
+          ),
+        ]
+      );
 
     const csv = [
       headers.join(","),
       ...rows.map(
-        (row) => row.join(",")
+        (row) =>
+          row.join(",")
       ),
     ].join("\n");
 
-
-    const blob = new Blob(
-      [csv],
-      {
-        type:
-          "text/csv;charset=utf-8;",
-      }
-    );
-
+    const blob =
+      new Blob(
+        [csv],
+        {
+          type:
+            "text/csv;charset=utf-8;",
+        }
+      );
 
     const url =
-      URL.createObjectURL(blob);
-
+      URL.createObjectURL(
+        blob
+      );
 
     const link =
-      document.createElement("a");
-
+      document.createElement(
+        "a"
+      );
 
     link.href = url;
 
     link.download =
       "AirGuard-Analytics-Report.csv";
 
-
-    document.body.appendChild(link);
+    document.body.appendChild(
+      link
+    );
 
     link.click();
 
-    document.body.removeChild(link);
+    document.body.removeChild(
+      link
+    );
 
-    URL.revokeObjectURL(url);
-
+    URL.revokeObjectURL(
+      url
+    );
   };
-
 
   // ========================================
   // RENDER
   // ========================================
 
   return (
-
     <div className="analytics-page">
-
 
       {/* HEADER */}
 
@@ -794,21 +638,24 @@ function Analytics() {
 
         <div>
 
-          <h1>Analytics</h1>
+          <h1>
+            Analytics
+          </h1>
 
           <p>
-            Explore air quality trends and
-            insights over time
+            Explore air quality trends
+            and insights over time
           </p>
 
         </div>
-
 
         <div className="analytics-actions">
 
           <div className="analytics-select">
 
-            <CalendarDays size={18} />
+            <CalendarDays
+              size={18}
+            />
 
             <select
               value={dateRange}
@@ -833,22 +680,24 @@ function Analytics() {
 
             </select>
 
-            <ChevronDown size={16} />
+            <ChevronDown
+              size={16}
+            />
 
           </div>
-
 
           <button
             className="export-report-btn"
             onClick={exportReport}
           >
 
-            <Download size={18} />
+            <Download
+              size={18}
+            />
 
             Export Report
 
           </button>
-
 
           <button
             className="export-report-btn"
@@ -859,7 +708,9 @@ function Analytics() {
             <RefreshCw
               size={18}
               className={
-                loading ? "spin" : ""
+                loading
+                  ? "spin"
+                  : ""
               }
             />
 
@@ -871,251 +722,36 @@ function Analytics() {
 
       </div>
 
-
       {/* ERROR */}
 
       {error && (
-
         <div
           style={{
-            marginBottom: "20px",
-            padding: "14px 18px",
-            borderRadius: "10px",
-            background: "#fff1f1",
-            color: "#c62828",
+            marginBottom:
+              "20px",
+
+            padding:
+              "14px 18px",
+
+            borderRadius:
+              "10px",
+
+            background:
+              "#fff1f1",
+
+            color:
+              "#c62828",
           }}
         >
-
           {error}
-
         </div>
-
       )}
 
-
-      {/* SUMMARY CARDS */}
-
-      <div className="analytics-summary">
-
-
-        {/* AVERAGE */}
-
-        <div className="analytics-card">
-
-          <div className="card-top">
-
-            <div className="analytics-icon">
-              <Wind size={24} />
-            </div>
-
-            <span>
-              Average AQI
-            </span>
-
-          </div>
-
-
-          <h2>
-            {loading
-              ? "..."
-              : Math.round(averageAQI)}
-          </h2>
-
-
-          <p className="aqi-good">
-            {loading
-              ? "Loading..."
-              : getAQIStatus(
-                  averageAQI
-                )}
-          </p>
-
-
-          <div
-            className={`comparison ${
-              trendDirection === "down"
-                ? "down"
-                : trendDirection === "up"
-                ? "up"
-                : ""
-            }`}
-          >
-
-            {trendDirection === "down"
-              ? `↓ ${trendPercentage}%`
-              : trendDirection === "up"
-              ? `↑ ${trendPercentage}%`
-              : "— Stable"}
-
-            {" "}vs recent data
-
-          </div>
-
-        </div>
-
-
-        {/* MAX */}
-
-        <div className="analytics-card">
-
-          <div className="card-top">
-
-            <div className="analytics-icon">
-              <TrendingUp size={24} />
-            </div>
-
-            <span>
-              Max AQI
-            </span>
-
-          </div>
-
-
-          <h2 className="aqi-moderate">
-
-            {loading
-              ? "..."
-              : Math.round(maxAQI)}
-
-          </h2>
-
-
-          <p>
-            {loading
-              ? "Loading..."
-              : getAQIStatus(maxAQI)}
-          </p>
-
-
-          <div className="comparison">
-            Highest recorded
-          </div>
-
-        </div>
-
-
-        {/* MIN */}
-
-        <div className="analytics-card">
-
-          <div className="card-top">
-
-            <div className="analytics-icon">
-              <TrendingDown size={24} />
-            </div>
-
-            <span>
-              Min AQI
-            </span>
-
-          </div>
-
-
-          <h2>
-
-            {loading
-              ? "..."
-              : Math.round(minAQI)}
-
-          </h2>
-
-
-          <p className="aqi-good">
-            {loading
-              ? "Loading..."
-              : getAQIStatus(minAQI)}
-          </p>
-
-
-          <div className="comparison">
-            Lowest recorded
-          </div>
-
-        </div>
-
-
-        {/* TOTAL */}
-
-        <div className="analytics-card">
-
-          <div className="card-top">
-
-            <div className="analytics-icon">
-              <CalendarDays size={24} />
-            </div>
-
-            <span>
-              Total Readings
-            </span>
-
-          </div>
-
-
-          <h2 className="dark-number">
-
-            {loading
-              ? "..."
-              : totalReadings.toLocaleString()}
-
-          </h2>
-
-
-          <p>
-            Recorded readings
-          </p>
-
-
-          <div className="comparison">
-            From backend
-          </div>
-
-        </div>
-
-
-        {/* AVAILABILITY */}
-
-        <div className="analytics-card">
-
-          <div className="card-top">
-
-            <div className="analytics-icon">
-              <Clock3 size={24} />
-            </div>
-
-            <span>
-              Data Availability
-            </span>
-
-          </div>
-
-
-          <h2>
-
-            {loading
-              ? "..."
-              : `${availability}%`}
-
-          </h2>
-
-
-          <p className="aqi-good">
-            Excellent
-          </p>
-
-
-          <div className="comparison">
-            Monitoring status
-          </div>
-
-        </div>
-
-      </div>
-
-
-      {/* CHART ROW 1 */}
+      {/* =====================================
+          CHART ROW 1
+      ====================================== */}
 
       <div className="analytics-row">
-
 
         {/* AQI TREND */}
 
@@ -1134,7 +770,6 @@ function Analytics() {
               </p>
 
             </div>
-
 
             <div className="small-select">
 
@@ -1161,12 +796,13 @@ function Analytics() {
 
               </select>
 
-              <ChevronDown size={15} />
+              <ChevronDown
+                size={15}
+              />
 
             </div>
 
           </div>
-
 
           <div className="chart-container">
 
@@ -1176,7 +812,8 @@ function Analytics() {
                 style={{
                   height: "100%",
                   display: "flex",
-                  alignItems: "center",
+                  alignItems:
+                    "center",
                   justifyContent:
                     "center",
                 }}
@@ -1190,7 +827,8 @@ function Analytics() {
                 style={{
                   height: "100%",
                   display: "flex",
-                  alignItems: "center",
+                  alignItems:
+                    "center",
                   justifyContent:
                     "center",
                 }}
@@ -1235,12 +873,10 @@ function Analytics() {
 
                   </defs>
 
-
                   <CartesianGrid
                     stroke="#eeeeee"
                     vertical={false}
                   />
-
 
                   <XAxis
                     dataKey="day"
@@ -1252,7 +888,6 @@ function Analytics() {
                     tickLine={false}
                   />
 
-
                   <YAxis
                     domain={[0, "auto"]}
                     tick={{
@@ -1263,9 +898,7 @@ function Analytics() {
                     tickLine={false}
                   />
 
-
                   <Tooltip />
-
 
                   <Area
                     type="monotone"
@@ -1294,8 +927,9 @@ function Analytics() {
 
         </div>
 
-
-        {/* DISTRIBUTION */}
+        {/* =================================
+            AQI DISTRIBUTION
+        ================================== */}
 
         <div className="chart-card distribution-card">
 
@@ -1315,9 +949,7 @@ function Analytics() {
 
           </div>
 
-
           <div className="distribution-content">
-
 
             <div className="donut-wrapper">
 
@@ -1342,7 +974,10 @@ function Analytics() {
                   >
 
                     {distributionData.map(
-                      (entry, index) => (
+                      (
+                        entry,
+                        index
+                      ) => (
 
                         <Cell
                           key={`cell-${index}`}
@@ -1362,11 +997,12 @@ function Analytics() {
 
               </ResponsiveContainer>
 
-
               <div className="donut-center">
 
                 <strong>
-                  {normalizedTrend.length}
+                  {
+                    normalizedTrend.length
+                  }
                 </strong>
 
                 <span>
@@ -1377,15 +1013,19 @@ function Analytics() {
 
             </div>
 
-
             <div className="legend">
 
               {distributionData.map(
-                (item, index) => (
+                (
+                  item,
+                  index
+                ) => (
 
                   <div
                     className="legend-item"
-                    key={item.name}
+                    key={
+                      item.name
+                    }
                   >
 
                     <div className="legend-name">
@@ -1394,7 +1034,9 @@ function Analytics() {
                         className="legend-dot"
                         style={{
                           background:
-                            COLORS[index],
+                            COLORS[
+                              index
+                            ],
                         }}
                       ></span>
 
@@ -1421,369 +1063,11 @@ function Analytics() {
 
       </div>
 
-
-      {/* CHART ROW 2 */}
-
-      <div className="analytics-row">
-
-
-        {/* TIME OF DAY */}
-
-        <div className="chart-card time-card">
-
-          <div className="chart-header">
-
-            <div>
-
-              <h3>
-                AQI by Time of Day
-              </h3>
-
-              <p>
-                Readings received by backend
-              </p>
-
-            </div>
-
-
-            <div className="small-select">
-
-              <select
-                value={timeFilter}
-                onChange={(e) =>
-                  setTimeFilter(
-                    e.target.value
-                  )
-                }
-              >
-
-                <option>
-                  AQI
-                </option>
-
-                <option>
-                  Status
-                </option>
-
-              </select>
-
-              <ChevronDown size={15} />
-
-            </div>
-
-          </div>
-
-
-          <div className="chart-container">
-
-            {timeData.length === 0 ? (
-
-              <div
-                style={{
-                  height: "100%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent:
-                    "center",
-                }}
-              >
-                No hourly data available.
-              </div>
-
-            ) : (
-
-              <ResponsiveContainer
-                width="100%"
-                height="100%"
-              >
-
-                <BarChart
-                  data={timeData}
-                >
-
-                  <CartesianGrid
-                    stroke="#eeeeee"
-                    vertical={false}
-                  />
-
-
-                  <XAxis
-                    dataKey="time"
-                    interval={2}
-                    tick={{
-                      fontSize: 10,
-                      fill: "#6d7478",
-                    }}
-                    axisLine={false}
-                    tickLine={false}
-                  />
-
-
-                  <YAxis
-                    domain={[0, "auto"]}
-                    tick={{
-                      fontSize: 11,
-                      fill: "#6d7478",
-                    }}
-                    axisLine={false}
-                    tickLine={false}
-                  />
-
-
-                  <Tooltip />
-
-
-                  <Bar
-                    dataKey="aqi"
-                    radius={[
-                      4,
-                      4,
-                      0,
-                      0,
-                    ]}
-                  >
-
-                    {timeData.map(
-                      (item, index) => {
-
-                        let color =
-                          "#4db653";
-
-                        if (
-                          item.aqi > 100
-                        ) {
-                          color =
-                            "#f4c62d";
-                        }
-
-                        if (
-                          item.aqi > 200
-                        ) {
-                          color =
-                            "#ef7c20";
-                        }
-
-                        if (
-                          item.aqi > 300
-                        ) {
-                          color =
-                            "#df3943";
-                        }
-
-                        return (
-
-                          <Cell
-                            key={`bar-${index}`}
-                            fill={color}
-                          />
-
-                        );
-
-                      }
-                    )}
-
-                  </Bar>
-
-                </BarChart>
-
-              </ResponsiveContainer>
-
-            )}
-
-          </div>
-
-        </div>
-
-
-        {/* INSIGHTS */}
-
-        <div className="chart-card insights-card">
-
-          <div className="chart-header">
-
-            <div>
-
-              <h3>
-                AQI Insights
-              </h3>
-
-              <p>
-                Air quality summary
-              </p>
-
-            </div>
-
-          </div>
-
-
-          <div className="insight-list">
-
-
-            <div className="insight-item">
-
-              <div className="insight-icon green">
-
-                <TrendingDown size={19} />
-
-              </div>
-
-
-              <div>
-
-                <strong>
-
-                  {trendDirection ===
-                  "down"
-                    ? `AQI improved by ${trendPercentage}%`
-                    : trendDirection ===
-                      "up"
-                    ? `AQI increased by ${trendPercentage}%`
-                    : "AQI trend is stable"}
-
-                </strong>
-
-
-                <p>
-                  Based on available
-                  backend trend data.
-                </p>
-
-              </div>
-
-            </div>
-
-
-            <div className="insight-item">
-
-              <div className="insight-icon orange">
-
-                <TrendingUp size={19} />
-
-              </div>
-
-
-              <div>
-
-                <strong>
-
-                  Highest AQI:{" "}
-
-                  {loading
-                    ? "..."
-                    : Math.round(
-                        highestReading?.aqi ||
-                        maxAQI
-                      )}
-
-                </strong>
-
-
-                <p>
-
-                  {highestReading?.timestamp
-                    ? `Recorded at ${formatTime(
-                        highestReading.timestamp
-                      )}.`
-                    : "Highest recorded reading."}
-
-                </p>
-
-              </div>
-
-            </div>
-
-
-            <div className="insight-item">
-
-              <div className="insight-icon blue">
-
-                <Clock3 size={19} />
-
-              </div>
-
-
-              <div>
-
-                <strong>
-
-                  Lowest AQI:{" "}
-
-                  {loading
-                    ? "..."
-                    : Math.round(
-                        lowestReading?.aqi ||
-                        minAQI
-                      )}
-
-                </strong>
-
-
-                <p>
-
-                  {lowestReading?.timestamp
-                    ? `Recorded at ${formatTime(
-                        lowestReading.timestamp
-                      )}.`
-                    : "Lowest recorded reading."}
-
-                </p>
-
-              </div>
-
-            </div>
-
-
-            <div className="insight-item">
-
-              <div className="insight-icon green">
-
-                <BarChart3 size={19} />
-
-              </div>
-
-
-              <div>
-
-                <strong>
-
-                  Average AQI:{" "}
-
-                  {loading
-                    ? "..."
-                    : Math.round(
-                        averageAQI
-                      )}
-
-                </strong>
-
-
-                <p>
-
-                  Overall status:{" "}
-
-                  {loading
-                    ? "Loading..."
-                    : getAQIStatus(
-                        averageAQI
-                      )}
-
-                </p>
-
-              </div>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-
-
-      {/* LAST UPDATED */}
+      {/* =====================================
+          LAST UPDATED
+      ====================================== */}
 
       {lastUpdated && (
-
         <div
           style={{
             marginTop: "20px",
@@ -1804,14 +1088,10 @@ function Analytics() {
           )}
 
         </div>
-
       )}
 
     </div>
-
   );
-
 }
-
 
 export default Analytics;
