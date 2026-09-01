@@ -30,11 +30,13 @@ function LiveMonitoring() {
 
   const [humidity, setHumidity] = useState(0);
 
-  const [mq2, setMq2] = useState(0);
+  const [co, setCo] = useState(0);
 
-  const [mq7, setMq7] = useState(0);
+  const [nh3, setNh3] = useState(0);
 
-  const [mq135, setMq135] = useState(0);
+  const [no2, setNo2] = useState(0);
+
+  const [nox, setNox] = useState(0);
 
   const [loading, setLoading] = useState(true);
 
@@ -145,47 +147,59 @@ function LiveMonitoring() {
 
 
       // ========================================
-      // MQ2
+      // CO (Carbon Monoxide)
       // ========================================
 
-      const currentMQ2 =
-        data?.mq2 ??
-        data?.MQ2 ??
-        data?.mq_2 ??
+      const currentCO =
+        data?.co ??
+        data?.CO ??
         0;
 
-      setMq2(
-        Number(currentMQ2) || 0
+      setCo(
+        Number(currentCO) || 0
       );
 
 
       // ========================================
-      // MQ7
+      // NH3 (Ammonia)
       // ========================================
 
-      const currentMQ7 =
-        data?.mq7 ??
-        data?.MQ7 ??
-        data?.mq_7 ??
+      const currentNH3 =
+        data?.nh3 ??
+        data?.NH3 ??
         0;
 
-      setMq7(
-        Number(currentMQ7) || 0
+      setNh3(
+        Number(currentNH3) || 0
       );
 
 
       // ========================================
-      // MQ135
+      // NO2 (Nitrogen Dioxide)
       // ========================================
 
-      const currentMQ135 =
-        data?.mq135 ??
-        data?.MQ135 ??
-        data?.mq_135 ??
+      const currentNO2 =
+        data?.no2 ??
+        data?.NO2 ??
         0;
 
-      setMq135(
-        Number(currentMQ135) || 0
+      setNo2(
+        Number(currentNO2) || 0
+      );
+
+
+      // ========================================
+      // NOx (Nitrogen Oxides)
+      // ========================================
+
+      const currentNOx =
+        data?.nox ??
+        data?.NOx ??
+        data?.NOX ??
+        0;
+
+      setNox(
+        Number(currentNOx) || 0
       );
 
 
@@ -571,7 +585,7 @@ function LiveMonitoring() {
 
 
           {/* ==================================
-              MQ2
+              CO
           ================================== */}
 
           <div className="sensor-card sensor-green">
@@ -592,11 +606,11 @@ function LiveMonitoring() {
 
 
             <p>
-              MQ-2
+              GAS
             </p>
 
             <h3>
-              Gas / Smoke
+              Carbon Monoxide
             </h3>
 
 
@@ -604,10 +618,10 @@ function LiveMonitoring() {
 
               {loading
                 ? "..."
-                : mq2}
+                : Number(co).toFixed(2)}
 
               <small>
-                {" "}level
+                {" "}ppm
               </small>
 
             </div>
@@ -626,7 +640,7 @@ function LiveMonitoring() {
 
 
           {/* ==================================
-              MQ7
+              NH3
           ================================== */}
 
           <div className="sensor-card sensor-blue">
@@ -647,11 +661,11 @@ function LiveMonitoring() {
 
 
             <p>
-              MQ-7
+              GAS
             </p>
 
             <h3>
-              Carbon Monoxide
+              Ammonia (NH₃)
             </h3>
 
 
@@ -659,7 +673,7 @@ function LiveMonitoring() {
 
               {loading
                 ? "..."
-                : mq7}
+                : Number(nh3).toFixed(2)}
 
               <small>
                 {" "}ppm
@@ -681,7 +695,7 @@ function LiveMonitoring() {
 
 
           {/* ==================================
-              MQ135
+              NO2
           ================================== */}
 
           <div className="sensor-card sensor-purple">
@@ -702,11 +716,11 @@ function LiveMonitoring() {
 
 
             <p>
-              MQ-135
+              GAS
             </p>
 
             <h3>
-              Air Quality
+              Nitrogen Dioxide (NO₂)
             </h3>
 
 
@@ -714,10 +728,65 @@ function LiveMonitoring() {
 
               {loading
                 ? "..."
-                : mq135}
+                : Number(no2).toFixed(2)}
 
               <small>
-                {" "}AQ level
+                {" "}ppm
+              </small>
+
+            </div>
+
+
+            <div className="sensor-status good">
+
+              ● Good
+
+            </div>
+
+
+            <div className="mini-wave"></div>
+
+          </div>
+
+
+          {/* ==================================
+              NOx
+          ================================== */}
+
+          <div className="sensor-card sensor-teal">
+
+            <div className="sensor-top">
+
+              <div className="sensor-icon">
+
+                <Gauge size={21} />
+
+              </div>
+
+              <span className="sensor-live">
+                LIVE
+              </span>
+
+            </div>
+
+
+            <p>
+              GAS
+            </p>
+
+            <h3>
+              Nitrogen Oxides (NOx)
+            </h3>
+
+
+            <div className="sensor-value">
+
+              {loading
+                ? "..."
+                : Number(nox).toFixed(2)}
+
+              <small>
+                {" "}ppm
               </small>
 
             </div>
