@@ -1,0 +1,91 @@
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100%;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Arial,
+    sans-serif;
+
+  background: #f8fbf9;
+  color: #24352b;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button,
+input,
+textarea,
+select {
+  font-family: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.airguard-app {
+  width: 100%;
+  min-height: 100vh;
+  background: #f8fbf9;
+}
+
+.airguard-main {
+  min-height: 100vh;
+  padding-top: 72px;
+  padding-left: 260px;
+}
+
+.page-content {
+  min-height: calc(100vh - 72px);
+  padding: 35px;
+}
+
+.page-content h1 {
+  margin: 0 0 8px;
+  font-size: 28px;
+  font-weight: 700;
+  color: #24352b;
+}
+
+.page-content p {
+  margin: 0;
+  color: #7b8981;
+}
+
+/* ================================
+   MOBILE
+   ================================ */
+
+@media (max-width: 899px) {
+  .airguard-main {
+    padding-left: 0;
+  }
+
+  .page-content {
+    padding: 24px 18px;
+  }
+}

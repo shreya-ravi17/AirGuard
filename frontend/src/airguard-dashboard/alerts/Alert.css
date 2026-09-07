@@ -1,0 +1,892 @@
+/* =====================================================
+   ALERT PAGE
+===================================================== */
+
+.alert-page {
+  width: 100%;
+  min-height: 100vh;
+  padding: 30px 32px;
+  background: #f7f9f9;
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #172027;
+}
+
+
+/* =====================================================
+   PAGE HEADER
+===================================================== */
+
+.alert-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+}
+
+.alert-page-header h1 {
+  margin: 0 0 7px;
+  font-size: 27px;
+  font-weight: 700;
+  color: #11181d;
+}
+
+.alert-page-header p {
+  margin: 0;
+  font-size: 14px;
+  color: #657078;
+}
+
+
+/* =====================================================
+   ALERT SETTINGS BUTTON
+===================================================== */
+
+.alert-settings-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 11px 18px;
+
+  border: 1px solid #83bfa9;
+  border-radius: 8px;
+
+  background: #ffffff;
+
+  color: #167a59;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+}
+
+.alert-settings-btn:hover {
+  background: #edf8f3;
+}
+
+
+/* =====================================================
+   SUMMARY CARDS
+===================================================== */
+
+.alert-summary-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, 1fr);
+
+  gap: 22px;
+
+  margin-bottom: 26px;
+}
+
+
+.summary-card {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+
+  min-height: 116px;
+
+  padding: 18px 20px;
+
+  box-sizing: border-box;
+
+  border-radius: 12px;
+
+  background: #ffffff;
+
+  border: 1px solid #e5e9e8;
+}
+
+
+/* Critical Card */
+
+.critical-card {
+  background: #fff9f9;
+  border-color: #efcaca;
+}
+
+
+/* High Card */
+
+.high-card {
+  background: #fffbf8;
+  border-color: #edd8c8;
+}
+
+
+/* Active Card */
+
+.active-card {
+  background: #fffdf5;
+  border-color: #eee0b8;
+}
+
+
+/* Resolved Card */
+
+.resolved-card {
+  background: #f6fcf9;
+  border-color: #c6ded4;
+}
+
+
+/* =====================================================
+   SUMMARY ICON
+===================================================== */
+
+.summary-icon {
+  width: 45px;
+  height: 45px;
+
+  min-width: 45px;
+
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-right: 16px;
+}
+
+
+/* Critical */
+
+.critical-icon {
+  color: #e44848;
+  background: #fde4e4;
+}
+
+
+/* High */
+
+.high-icon {
+  color: #e8752c;
+  background: #fce8dc;
+}
+
+
+/* Active */
+
+.active-icon {
+  color: #eeb82a;
+  background: #fff2c9;
+}
+
+
+/* Resolved */
+
+.resolved-icon {
+  color: #2aad79;
+  background: #dff4eb;
+}
+
+
+/* =====================================================
+   SUMMARY CONTENT
+===================================================== */
+
+.summary-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.summary-label {
+  margin-bottom: 4px;
+
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.critical-card .summary-label {
+  color: #c53f3f;
+}
+
+.high-card .summary-label {
+  color: #c76527;
+}
+
+.active-card .summary-label {
+  color: #c39419;
+}
+
+.resolved-card .summary-label {
+  color: #247c5b;
+}
+
+
+.summary-content strong {
+  margin-bottom: 4px;
+
+  font-size: 28px;
+  line-height: 30px;
+
+  font-weight: 500;
+
+  color: #11181d;
+}
+
+
+.summary-content p {
+  margin: 0;
+
+  font-size: 12px;
+
+  color: #59636a;
+}
+
+
+/* Summary Arrow */
+
+.summary-arrow {
+  position: absolute;
+
+  right: 17px;
+  bottom: 18px;
+
+  color: #607078;
+}
+
+
+/* =====================================================
+   ACTIVE ALERTS CARD
+===================================================== */
+
+.active-alerts-card {
+  width: 100%;
+
+  padding: 20px;
+
+  box-sizing: border-box;
+
+  background: #ffffff;
+
+  border: 1px solid #e7eaea;
+
+  border-radius: 13px;
+
+  box-shadow:
+    0 3px 12px rgba(0, 0, 0, 0.03);
+
+  margin-bottom: 26px;
+}
+
+
+/* Header */
+
+.active-alerts-header {
+  margin-bottom: 17px;
+}
+
+.active-alerts-header h2 {
+  margin: 0;
+
+  font-size: 17px;
+
+  font-weight: 700;
+
+  color: #151c20;
+}
+
+
+/* =====================================================
+   ALERT LIST
+===================================================== */
+
+.alerts-list {
+  width: 100%;
+
+  border: 1px solid #edf0ef;
+
+  border-radius: 11px;
+
+  overflow: hidden;
+}
+
+
+/* =====================================================
+   ALERT ROW
+===================================================== */
+
+.alert-row {
+  position: relative;
+
+  display: flex;
+
+  align-items: center;
+
+  min-height: 72px;
+
+  padding: 11px 15px;
+
+  box-sizing: border-box;
+
+  border-bottom: 1px solid #edf0ef;
+
+  transition:
+    background 0.2s ease;
+}
+
+.alert-row:last-child {
+  border-bottom: none;
+}
+
+.alert-row:hover {
+  background: #fafcfc;
+}
+
+
+/* =====================================================
+   ALERT ICON
+===================================================== */
+
+.alert-row-icon {
+  width: 38px;
+  height: 38px;
+
+  min-width: 38px;
+
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-right: 14px;
+}
+
+.alert-row-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+
+/* Critical */
+
+.alert-row-icon.critical {
+  color: #e24a4a;
+  background: #fde8e8;
+}
+
+
+/* High */
+
+.alert-row-icon.high {
+  color: #e47732;
+  background: #fceddf;
+}
+
+
+/* Moderate */
+
+.alert-row-icon.moderate {
+  color: #eeb72b;
+  background: #fff4d0;
+}
+
+
+/* Low */
+
+.alert-row-icon.low {
+  color: #438fd1;
+  background: #e7f3fd;
+}
+
+
+/* Success */
+
+.alert-row-icon.success {
+  color: #2aad78;
+  background: #e1f5eb;
+}
+
+
+/* =====================================================
+   ALERT CONTENT
+===================================================== */
+
+.alert-row-content {
+  flex: 1;
+
+  min-width: 0;
+}
+
+
+.alert-title-line {
+  display: flex;
+
+  align-items: center;
+
+  gap: 9px;
+
+  margin-bottom: 4px;
+}
+
+
+.alert-title-line h3 {
+  margin: 0;
+
+  font-size: 14px;
+
+  font-weight: 700;
+
+  color: #182027;
+}
+
+
+.alert-row-content p {
+  margin: 0;
+
+  font-size: 12px;
+
+  line-height: 17px;
+
+  color: #687279;
+}
+
+
+/* =====================================================
+   ALERT BADGES
+===================================================== */
+
+.alert-badge {
+  display: inline-flex;
+
+  align-items: center;
+
+  padding: 3px 8px;
+
+  border-radius: 6px;
+
+  font-size: 10px;
+
+  font-weight: 600;
+}
+
+
+/* Critical */
+
+.alert-badge.critical {
+  color: #d94747;
+  background: #fde5e5;
+}
+
+
+/* High */
+
+.alert-badge.high {
+  color: #d66c29;
+  background: #fce9dc;
+}
+
+
+/* Moderate */
+
+.alert-badge.moderate {
+  color: #c79519;
+  background: #fff3ca;
+}
+
+
+/* Low */
+
+.alert-badge.low {
+  color: #4089c8;
+  background: #e7f3fc;
+}
+
+
+/* Success */
+
+.alert-badge.success {
+  color: #27815e;
+  background: #e0f4ea;
+}
+
+
+/* =====================================================
+   ALERT TIME
+===================================================== */
+
+.alert-row-time {
+  width: 75px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: flex-end;
+
+  gap: 4px;
+
+  margin-left: 15px;
+}
+
+.alert-row-time span:first-child {
+  font-size: 12px;
+
+  color: #515b62;
+
+  font-weight: 500;
+}
+
+.alert-row-time span:last-child {
+  font-size: 11px;
+
+  color: #747c82;
+}
+
+
+/* =====================================================
+   ALERT ARROW
+===================================================== */
+
+.alert-row-arrow {
+  width: 30px;
+  height: 30px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-left: 9px;
+
+  border: none;
+
+  background: transparent;
+
+  color: #536068;
+
+  cursor: pointer;
+}
+
+.alert-row-arrow:hover {
+  color: #17805c;
+}
+
+
+/* =====================================================
+   VIEW ALL ALERTS
+===================================================== */
+
+.view-all-alerts-btn {
+  width: 100%;
+
+  margin-top: 12px;
+
+  padding: 11px;
+
+  border: none;
+
+  border-radius: 8px;
+
+  background: #f2f9f6;
+
+  color: #21815f;
+
+  font-size: 13px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: background 0.2s ease;
+}
+
+.view-all-alerts-btn:hover {
+  background: #e6f5ef;
+}
+
+
+/* =====================================================
+   HEALTH TIPS
+===================================================== */
+
+.health-tips-card {
+  width: 100%;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  padding: 17px 22px;
+
+  box-sizing: border-box;
+
+  background: #f4fbf8;
+
+  border: 1px solid #cce3d9;
+
+  border-radius: 12px;
+}
+
+
+/* Left Side */
+
+.health-tips-left {
+  display: flex;
+
+  align-items: center;
+
+  gap: 13px;
+}
+
+
+/* Health Icon */
+
+.health-icon {
+  width: 39px;
+  height: 39px;
+
+  min-width: 39px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  color: #16815d;
+
+  background: #ddf2e9;
+}
+
+
+/* Health Text */
+
+.health-tips-left h3 {
+  margin: 0 0 4px;
+
+  font-size: 14px;
+
+  font-weight: 700;
+
+  color: #18221f;
+}
+
+
+.health-tips-left p {
+  margin: 0;
+
+  font-size: 12px;
+
+  color: #65716d;
+}
+
+
+/* =====================================================
+   HEALTH TIPS BUTTON
+===================================================== */
+
+.health-tips-btn {
+  display: flex;
+
+  align-items: center;
+
+  gap: 7px;
+
+  padding: 10px 16px;
+
+  border: 1px solid #82bda8;
+
+  border-radius: 8px;
+
+  background: #ffffff;
+
+  color: #187c5a;
+
+  font-size: 12px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.health-tips-btn:hover {
+  background: #eef8f4;
+}
+
+
+/* =====================================================
+   TABLET
+===================================================== */
+
+@media (max-width: 1100px) {
+
+  .alert-summary-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (max-width: 768px) {
+
+  .alert-page {
+    padding: 20px 15px;
+  }
+
+
+  /* Header */
+
+  .alert-page-header {
+    align-items: flex-start;
+
+    flex-direction: column;
+
+    gap: 15px;
+  }
+
+
+  .alert-settings-btn {
+    align-self: flex-start;
+  }
+
+
+  /* Summary */
+
+  .alert-summary-grid {
+    grid-template-columns: 1fr;
+
+    gap: 12px;
+  }
+
+
+  /* Alert Row */
+
+  .alert-row {
+    align-items: flex-start;
+
+    padding: 13px;
+  }
+
+
+  .alert-row-time {
+    width: auto;
+
+    margin-left: 8px;
+  }
+
+
+  .alert-row-arrow {
+    display: none;
+  }
+
+
+  .alert-title-line {
+    align-items: flex-start;
+
+    flex-direction: column;
+
+    gap: 5px;
+  }
+
+
+  /* Health */
+
+  .health-tips-card {
+    align-items: flex-start;
+
+    flex-direction: column;
+
+    gap: 15px;
+  }
+
+
+  .health-tips-btn {
+    align-self: flex-start;
+  }
+
+}
+
+
+/* =====================================================
+   SMALL MOBILE
+===================================================== */
+
+@media (max-width: 480px) {
+
+  .alert-page-header h1 {
+    font-size: 23px;
+  }
+
+
+  .alert-page-header p {
+    font-size: 12px;
+  }
+
+
+  .summary-card {
+    min-height: 105px;
+
+    padding: 15px;
+  }
+
+
+  .summary-icon {
+    width: 40px;
+    height: 40px;
+
+    min-width: 40px;
+  }
+
+
+  .summary-content strong {
+    font-size: 24px;
+  }
+
+
+  .active-alerts-card {
+    padding: 14px;
+  }
+
+
+  .alert-row {
+    min-height: 80px;
+  }
+
+
+  .alert-row-icon {
+    width: 34px;
+    height: 34px;
+
+    min-width: 34px;
+
+    margin-right: 10px;
+  }
+
+
+  .alert-title-line h3 {
+    font-size: 12px;
+  }
+
+
+  .alert-row-content p {
+    font-size: 11px;
+  }
+
+
+  .alert-row-time span {
+    font-size: 10px !important;
+  }
+
+
+  .health-tips-left p {
+    line-height: 17px;
+  }
+
+}

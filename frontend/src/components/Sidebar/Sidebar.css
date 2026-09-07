@@ -1,0 +1,305 @@
+.airguard-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 270px;
+  height: 100vh;
+
+  background: rgba(255, 255, 255, 0.97);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+
+  border-right: 1px solid #e4eee7;
+
+  padding: 22px 16px;
+
+  display: flex;
+  flex-direction: column;
+
+  z-index: 2000;
+
+  transform: translateX(-100%);
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+
+  box-shadow: 12px 0 40px rgba(35, 70, 45, 0.08);
+}
+
+/* OPEN SIDEBAR */
+
+.airguard-sidebar.open {
+  transform: translateX(0);
+}
+
+
+/* ================= HEADER ================= */
+
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 8px 28px;
+}
+
+.airguard-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  font-size: 20px;
+  font-weight: 750;
+
+  color: #1e3326;
+}
+
+.logo-symbol {
+  width: 38px;
+  height: 38px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 12px;
+
+  background: #e8f7ec;
+  color: #3d9360;
+
+  font-weight: 800;
+}
+
+
+/* ================= CLOSE BUTTON ================= */
+
+.close-sidebar {
+  width: 34px;
+  height: 34px;
+
+  border: none;
+  background: transparent;
+
+  border-radius: 10px;
+
+  color: #829088;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  transition: all 0.2s ease;
+}
+
+.close-sidebar:hover {
+  background: #edf7f0;
+  color: #3c8c59;
+
+  transform: rotate(90deg);
+}
+
+
+/* ================= LABEL ================= */
+
+.sidebar-label {
+  padding: 0 12px;
+
+  margin: 5px 0 10px;
+
+  font-size: 9px;
+
+  letter-spacing: 1.3px;
+
+  font-weight: 700;
+
+  color: #a0aaa4;
+}
+
+
+/* ================= MENU ================= */
+
+.sidebar-menu {
+  display: flex;
+  flex-direction: column;
+
+  gap: 5px;
+}
+
+.sidebar-item {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+
+  gap: 13px;
+
+  padding: 12px 13px;
+
+  border-radius: 12px;
+
+  text-decoration: none;
+
+  color: #738078;
+
+  font-size: 12px;
+  font-weight: 500;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.sidebar-item:hover {
+  background: #f2f9f4;
+  color: #3d8e5a;
+
+  transform: translateX(3px);
+}
+
+.sidebar-item.active {
+  background: #e8f6ec;
+
+  color: #348753;
+
+  font-weight: 650;
+}
+
+.sidebar-item.active::before {
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+
+  width: 3px;
+  height: 20px;
+
+  border-radius: 0 5px 5px 0;
+
+  background: #54a86e;
+}
+
+
+/* ================= BOTTOM ================= */
+
+.sidebar-bottom {
+  margin-top: auto;
+}
+
+.device-mini-card {
+  margin-top: 18px;
+
+  padding: 13px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  border-radius: 14px;
+
+  background: #f3faf5;
+
+  border: 1px solid #e3eee6;
+}
+
+.device-status-dot {
+  width: 9px;
+  height: 9px;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  background: #62b77b;
+
+  box-shadow:
+    0 0 0 4px rgba(98, 183, 123, 0.12);
+
+  animation: devicePulse 2s infinite;
+}
+
+.device-mini-card strong,
+.device-mini-card span {
+  display: block;
+}
+
+.device-mini-card strong {
+  font-size: 10px;
+  color: #415048;
+}
+
+.device-mini-card span {
+  margin-top: 3px;
+
+  font-size: 9px;
+
+  color: #71a07d;
+}
+
+
+/* ================= OVERLAY ================= */
+
+.sidebar-overlay {
+  position: fixed;
+
+  inset: 0;
+
+  background: rgba(22, 38, 28, 0.22);
+
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+
+  z-index: 1900;
+
+  animation: overlayIn 0.25s ease;
+}
+
+
+/* ================= ANIMATIONS ================= */
+
+@keyframes devicePulse {
+  0% {
+    box-shadow:
+      0 0 0 0 rgba(98, 183, 123, 0.3);
+  }
+
+  70% {
+    box-shadow:
+      0 0 0 7px rgba(98, 183, 123, 0);
+  }
+
+  100% {
+    box-shadow:
+      0 0 0 0 rgba(98, 183, 123, 0);
+  }
+}
+
+@keyframes overlayIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+
+/* ================= MOBILE ================= */
+
+@media (max-width: 899px) {
+  .airguard-sidebar {
+    width: 280px;
+  }
+}
+
+
+/* ================= SMALL MOBILE ================= */
+
+@media (max-width: 480px) {
+  .airguard-sidebar {
+    width: 270px;
+  }
+}
