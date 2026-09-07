@@ -16,11 +16,14 @@ class SensorReading(Base):
     nh3 = Column(Float)
     no2 = Column(Float)
     nox = Column(Float)
+    pm2_5 = Column(Float)      # new — from PMS5003
+    pm10 = Column(Float)       # new — from PMS5003
     temperature = Column(Float, nullable=True)
     humidity = Column(Float, nullable=True)
 
     aqi_value = Column(Float)
     aqi_category = Column(String)
+
 
 class DeviceSettings(Base):
     __tablename__ = "device_settings"
@@ -28,6 +31,6 @@ class DeviceSettings(Base):
     id = Column(Integer, primary_key=True, index=True)
     device_id = Column(String, unique=True, index=True, default="airguard_01")
     device_name = Column(String, default="My AirGuard Mask")
-    alert_threshold = Column(Integer, default=200)   # notify if AQI crosses this
-    temperature_unit = Column(String, default="C")    # "C" or "F"
-    notifications_enabled = Column(Integer, default=1)  # 1 = on, 0 = off
+    alert_threshold = Column(Integer, default=200)
+    temperature_unit = Column(String, default="C")
+    notifications_enabled = Column(Integer, default=1)
