@@ -4,7 +4,7 @@ def get_city_from_coords(lat: float, lon: float) -> str:
     try:
         url = "https://nominatim.openstreetmap.org/reverse"
         params = {"lat": lat, "lon": lon, "format": "json"}
-        headers = {"User-Agent": "AirGuard-App"}  # required by Nominatim's usage policy
+        headers = {"User-Agent": "AirGuard-App"}
 
         response = requests.get(url, params=params, headers=headers, timeout=5)
         data = response.json()

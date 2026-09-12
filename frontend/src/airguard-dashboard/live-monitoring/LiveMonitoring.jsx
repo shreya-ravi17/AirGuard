@@ -50,36 +50,16 @@ function LiveMonitoring() {
   // AQI STATUS
   // ==========================================
 
-  const getAQIStatus = (value) => {
-
-    const currentAQI = Number(value) || 0;
-
-    if (currentAQI <= 50) {
-      return {
-        text: "Good",
-        className: "good",
-      };
-    }
-
-    if (currentAQI <= 100) {
-      return {
-        text: "Moderate",
-        className: "moderate",
-      };
-    }
-
-    if (currentAQI <= 200) {
-      return {
-        text: "Unhealthy",
-        className: "danger",
-      };
-    }
-
-    return {
-      text: "Very Unhealthy",
-      className: "danger",
-    };
+ const getAQIStatus = (category) => {
+  const statusMap = {
+    "Good": { text: "Good", className: "good" },
+    "Moderate": { text: "Moderate", className: "moderate" },
+    "Poor": { text: "Poor", className: "danger" },
+    "Very Poor": { text: "Very Poor", className: "danger" },
+    "Severe": { text: "Severe", className: "danger" },
   };
+  return statusMap[category] || { text: "Unknown", className: "unknown" };
+};
 
 
   // ==========================================

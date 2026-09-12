@@ -16,8 +16,8 @@ class SensorReading(Base):
     nh3 = Column(Float)
     no2 = Column(Float)
     nox = Column(Float)
-    pm2_5 = Column(Float)      # new — from PMS5003
-    pm10 = Column(Float)       # new — from PMS5003
+    pm2_5 = Column(Float)
+    pm10 = Column(Float)
     temperature = Column(Float, nullable=True)
     humidity = Column(Float, nullable=True)
 

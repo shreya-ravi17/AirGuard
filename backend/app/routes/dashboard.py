@@ -1,13 +1,27 @@
-import pandas as pd
 from fastapi import APIRouter, Depends, Query
+from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from sqlalchemy import desc, func
-from datetime import date as date_type
+from datetime import datetime, timedelta, date as date_type
 from typing import Optional
+import csv
+import io
+import numpy as np
+import pandas as pd
+
 from .. import models
 from ..database import get_db
+from ..ml_bridge import forecast_next_aqi, forecast_model
 
 router = APIRouter(prefix="/api", tags=["dashboard"])
+
+RANGE_MAP = {
+    "live": timedelta(hours=1),
+    "1D": timedelta(days=1),
+    "3D": timedelta(days=3),
+    "month": timedelta(days=30),
+}
+
 
 def get_recommendation(category: str) -> str:
     tips = {
@@ -19,6 +33,28 @@ def get_recommendation(category: str) -> str:
     }
     return tips.get(category, "No recommendation available.")
 
+
+def get_risk_level(aqi: float) -> str:
+    if aqi <= 100:
+        return "Good"
+    elif aqi <= 200:
+        return "Moderate"
+    elif aqi <= 300:
+        return "Poor"
+    elif aqi <= 400:
+        return "Very Poor"
+    else:
+        return "Severe"
+
+
+def get_forecast_confidence(day1, day2, day3):
+    input_df = pd.DataFrame([{'AQI_lag1': day1, 'AQI_lag2': day2, 'AQI_lag3': day3}])
+    tree_predictions = [tree.predict(input_df)[0] for tree in forecast_model.estimators_]
+    std_dev = np.std(tree_predictions)
+    confidence = max(50, min(99, 100 - std_dev))
+    return round(confidence, 1)
+
+
 @router.get("/current")
 def get_current_aqi(db: Session = Depends(get_db)):
     latest = db.query(models.SensorReading).order_by(desc(models.SensorReading.timestamp)).first()
@@ -28,14 +64,17 @@ def get_current_aqi(db: Session = Depends(get_db)):
         "aqi_value": latest.aqi_value,
         "aqi_category": latest.aqi_category,
         "timestamp": latest.timestamp,
-        "temperature": latest.temperature,
-        "humidity": latest.humidity,
         "co": latest.co,
         "nh3": latest.nh3,
         "no2": latest.no2,
         "nox": latest.nox,
+        "pm2_5": latest.pm2_5,
+        "pm10": latest.pm10,
+        "temperature": latest.temperature,
+        "humidity": latest.humidity,
         "recommendation": get_recommendation(latest.aqi_category),
     }
+
 
 @router.get("/history")
 def get_history(
@@ -48,21 +87,15 @@ def get_history(
     query = db.query(models.SensorReading)
 
     if search:
-        query = query.filter(
-            models.SensorReading.city.ilike(f"%{search}%")
-        )
+        query = query.filter(models.SensorReading.city.ilike(f"%{search}%"))
 
     if date:
-        query = query.filter(
-            func.date(models.SensorReading.timestamp) == date
-        )
+        query = query.filter(func.date(models.SensorReading.timestamp) == date)
 
     offset = (page - 1) * page_size
     total = query.count()
-
     readings = (
-        query
-        .order_by(desc(models.SensorReading.timestamp))
+        query.order_by(desc(models.SensorReading.timestamp))
         .offset(offset)
         .limit(page_size)
         .all()
@@ -75,15 +108,31 @@ def get_history(
         "data": readings
     }
 
-from datetime import datetime, timedelta
-from sqlalchemy import func
 
-RANGE_MAP = {
-    "live": timedelta(hours=1),
-    "1D": timedelta(days=1),
-    "3D": timedelta(days=3),
-    "month": timedelta(days=30),
-}
+@router.get("/history/export")
+def export_history_csv(db: Session = Depends(get_db)):
+    readings = db.query(models.SensorReading).order_by(desc(models.SensorReading.timestamp)).all()
+
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow([
+        "Timestamp", "Device ID", "City", "CO", "NH3", "NO2", "NOx",
+        "PM2.5", "PM10", "Temperature", "Humidity", "AQI Value", "AQI Category"
+    ])
+
+    for r in readings:
+        writer.writerow([
+            r.timestamp, r.device_id, r.city, r.co, r.nh3, r.no2, r.nox,
+            r.pm2_5, r.pm10, r.temperature, r.humidity, r.aqi_value, r.aqi_category
+        ])
+
+    output.seek(0)
+    return StreamingResponse(
+        output,
+        media_type="text/csv",
+        headers={"Content-Disposition": "attachment; filename=airguard_history.csv"}
+    )
+
 
 @router.get("/trend")
 def get_trend(range: str = "1D", db: Session = Depends(get_db)):
@@ -104,6 +153,7 @@ def get_trend(range: str = "1D", db: Session = Depends(get_db)):
             for r in readings
         ]
     }
+
 
 @router.get("/stats")
 def get_stats(range: str = "1D", db: Session = Depends(get_db)):
@@ -130,23 +180,9 @@ def get_stats(range: str = "1D", db: Session = Depends(get_db)):
         "category_breakdown": {cat: count for cat, count in category_counts},
     }
 
-from ..ml_bridge import forecast_next_aqi
-
-def get_risk_level(aqi: float) -> str:
-    if aqi <= 100:
-        return "Good"
-    elif aqi <= 200:
-        return "Moderate"
-    elif aqi <= 300:
-        return "Poor"
-    elif aqi <= 400:
-        return "Very Poor"
-    else:
-        return "Severe"
 
 @router.get("/forecast")
 def get_forecast(db: Session = Depends(get_db)):
-    # Get daily average AQI for the last 3 distinct days
     daily_avg = (
         db.query(
             func.date(models.SensorReading.timestamp).label("day"),
@@ -164,7 +200,6 @@ def get_forecast(db: Session = Depends(get_db)):
             "days_available": len(daily_avg)
         }
 
-    # daily_avg[0] = most recent day = day_minus_1
     day1 = round(daily_avg[0].avg_aqi, 1)
     day2 = round(daily_avg[1].avg_aqi, 1)
     day3 = round(daily_avg[2].avg_aqi, 1)
@@ -180,6 +215,7 @@ def get_forecast(db: Session = Depends(get_db)):
         "recommendation": get_recommendation(get_risk_level(result["forecast_aqi"])),
     }
 
+
 @router.get("/alerts")
 def get_alerts(db: Session = Depends(get_db)):
     readings = (
@@ -189,12 +225,12 @@ def get_alerts(db: Session = Depends(get_db)):
     )
 
     alerts = []
+    severity_order = ["Good", "Moderate", "Poor", "Very Poor", "Severe"]
+
     for i in range(1, len(readings)):
         prev = readings[i - 1]
         curr = readings[i]
 
-        # Alert if category worsened
-        severity_order = ["Good", "Moderate", "Poor", "Very Poor", "Severe"]
         if curr.aqi_category in severity_order and prev.aqi_category in severity_order:
             if severity_order.index(curr.aqi_category) > severity_order.index(prev.aqi_category):
                 alerts.append({
@@ -203,39 +239,5 @@ def get_alerts(db: Session = Depends(get_db)):
                     "aqi_value": curr.aqi_value,
                 })
 
-    # Most recent first
     alerts.reverse()
     return {"alerts": alerts}
-
-from fastapi.responses import StreamingResponse
-import csv
-import io
-
-@router.get("/history/export")
-def export_history_csv(db: Session = Depends(get_db)):
-    readings = db.query(models.SensorReading).order_by(desc(models.SensorReading.timestamp)).all()
-
-    output = io.StringIO()
-    writer = csv.writer(output)
-    writer.writerow(["Timestamp", "Device ID", "CO", "NH3", "NO2", "NOx", "Temperature", "Humidity", "AQI Value", "AQI Category"])
-
-    for r in readings:
-        writer.writerow([r.timestamp, r.device_id, r.co, r.nh3, r.no2, r.nox, r.temperature, r.humidity, r.aqi_value, r.aqi_category])
-
-    output.seek(0)
-    return StreamingResponse(
-        output,
-        media_type="text/csv",
-        headers={"Content-Disposition": "attachment; filename=airguard_history.csv"}
-    )
-
-import numpy as np
-from ..ml_bridge import forecast_model
-
-def get_forecast_confidence(day1, day2, day3):
-    input_df = pd.DataFrame([{'AQI_lag1': day1, 'AQI_lag2': day2, 'AQI_lag3': day3}])
-    tree_predictions = [tree.predict(input_df)[0] for tree in forecast_model.estimators_]
-    std_dev = np.std(tree_predictions)
-    # Lower spread = higher confidence. Cap between 50-99%.
-    confidence = max(50, min(99, 100 - std_dev))
-    return round(confidence, 1)

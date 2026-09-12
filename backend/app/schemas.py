@@ -9,8 +9,8 @@ class SensorInput(BaseModel):
     nh3: float
     no2: float
     nox: float
-    pm2_5: float          # new
-    pm10: float           # new
+    pm2_5: float
+    pm10: float
     temperature: float | None = None
     humidity: float | None = None
 
@@ -26,8 +26,8 @@ class SensorReadingOut(BaseModel):
     nh3: float
     no2: float
     nox: float
-    pm2_5: float           # new
-    pm10: float            # new
+    pm2_5: float
+    pm10: float
     aqi_value: float
     aqi_category: str
 
@@ -40,6 +40,7 @@ class SettingsInput(BaseModel):
     alert_threshold: int | None = None
     temperature_unit: str | None = None
     notifications_enabled: bool | None = None
+
 
 class SettingsOut(BaseModel):
     device_id: str
