@@ -1,762 +1,2035 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import {
+  ShieldCheck,
+  Bell,
   MapPin,
-  Activity,
-  BarChart3,
-  History,
+  X,
+  Leaf,
+  Database,
+  Download,
   BrainCircuit,
-  AlertTriangle,
-  ArrowUpRight,
-  Droplets,
-  Thermometer,
+  Clock3,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 
-import { getCurrent } from "../services/api";
 import "./Dashboard.css";
 
+/* =========================================================
+   API CONFIGURATION
+   ========================================================= */
+
+const API_BASE_URL = "http://127.0.0.1:8000";
+
+/* =========================================================
+   HISTORY CONFIGURATION
+   ========================================================= */
+
+const HISTORY_LIMIT = 5;
+
+/* =========================================================
+   DEFAULT ENVIRONMENTAL READINGS
+   ========================================================= */
+
+const defaultSensorData = [
+  {
+    name: "Carbon Monoxide (CO)",
+    value: "0.00",
+    unit: "ppm",
+    status: "Good",
+    type: "green",
+    icon: "CO",
+  },
+
+  {
+    name: "Ammonia (NH₃)",
+    value: "0.00",
+    unit: "ppm",
+    status: "Good",
+    type: "green",
+    icon: "NH₃",
+  },
+
+  {
+    name: "Nitrogen Dioxide (NO₂)",
+    value: "0.00",
+    unit: "ppm",
+    status: "Good",
+    type: "green",
+    icon: "NO₂",
+  },
+
+  {
+    name: "Nitrogen Oxides (NOx)",
+    value: "0.00",
+    unit: "ppm",
+    status: "Good",
+    type: "green",
+    icon: "NOx",
+  },
+
+  {
+    name: "Temperature",
+    value: "0.0",
+    unit: "°C",
+    status: "Comfortable",
+    type: "blue",
+    icon: "°",
+  },
+
+  {
+    name: "Humidity",
+    value: "0",
+    unit: "%",
+    status: "Comfortable",
+    type: "blue",
+    icon: "%",
+  },
+];
+
+/* =========================================================
+   DEFAULT HISTORY DATA
+   Used only if backend is temporarily unavailable.
+   ========================================================= */
+
+const fallbackHistoryRecords = [
+  {
+    date: "Oct 4, 2026",
+    time: "07:45 PM",
+    source: "PMS Sensor",
+    aqi: "142",
+    status: "Moderate",
+  },
+
+  {
+    date: "Oct 4, 2026",
+    time: "07:30 PM",
+    source: "XAMPP / MySQL",
+    aqi: "138",
+    status: "Moderate",
+  },
+
+  {
+    date: "Oct 4, 2026",
+    time: "07:15 PM",
+    source: "PMS Sensor",
+    aqi: "135",
+    status: "Moderate",
+  },
+
+  {
+    date: "Oct 4, 2026",
+    time: "07:00 PM",
+    source: "XAMPP / MySQL",
+    aqi: "130",
+    status: "Moderate",
+  },
+
+  {
+    date: "Oct 4, 2026",
+    time: "06:45 PM",
+    source: "PMS Sensor",
+    aqi: "128",
+    status: "Moderate",
+  },
+
+  {
+    date: "Oct 4, 2026",
+    time: "06:30 PM",
+    source: "XAMPP / MySQL",
+    aqi: "125",
+    status: "Moderate",
+  },
+
+  {
+    date: "Oct 4, 2026",
+    time: "06:15 PM",
+    source: "PMS Sensor",
+    aqi: "121",
+    status: "Moderate",
+  },
+
+  {
+    date: "Oct 4, 2026",
+    time: "06:00 PM",
+    source: "XAMPP / MySQL",
+    aqi: "118",
+    status: "Moderate",
+  },
+
+  {
+    date: "Oct 4, 2026",
+    time: "05:45 PM",
+    source: "PMS Sensor",
+    aqi: "115",
+    status: "Moderate",
+  },
+
+  {
+    date: "Oct 4, 2026",
+    time: "05:30 PM",
+    source: "XAMPP / MySQL",
+    aqi: "112",
+    status: "Moderate",
+  },
+
+  {
+    date: "Oct 4, 2026",
+    time: "05:15 PM",
+    source: "PMS Sensor",
+    aqi: "108",
+    status: "Moderate",
+  },
+
+  {
+    date: "Oct 4, 2026",
+    time: "05:00 PM",
+    source: "XAMPP / MySQL",
+    aqi: "105",
+    status: "Moderate",
+  },
+
+  {
+    date: "Oct 4, 2026",
+    time: "04:45 PM",
+    source: "PMS Sensor",
+    aqi: "102",
+    status: "Moderate",
+  },
+
+  {
+    date: "Oct 4, 2026",
+    time: "04:30 PM",
+    source: "XAMPP / MySQL",
+    aqi: "98",
+    status: "Good",
+  },
+
+  {
+    date: "Oct 4, 2026",
+    time: "04:15 PM",
+    source: "PMS Sensor",
+    aqi: "95",
+    status: "Good",
+  },
+
+  {
+    date: "Oct 4, 2026",
+    time: "04:00 PM",
+    source: "XAMPP / MySQL",
+    aqi: "92",
+    status: "Good",
+  },
+
+  {
+    date: "Oct 4, 2026",
+    time: "03:45 PM",
+    source: "PMS Sensor",
+    aqi: "89",
+    status: "Good",
+  },
+
+  {
+    date: "Oct 4, 2026",
+    time: "03:30 PM",
+    source: "XAMPP / MySQL",
+    aqi: "86",
+    status: "Good",
+  },
+
+  {
+    date: "Oct 4, 2026",
+    time: "03:15 PM",
+    source: "PMS Sensor",
+    aqi: "84",
+    status: "Good",
+  },
+
+  {
+    date: "Oct 4, 2026",
+    time: "03:00 PM",
+    source: "XAMPP / MySQL",
+    aqi: "82",
+    status: "Good",
+  },
+];
+
+/* =========================================================
+   CURRENT AIR QUALITY
+   ========================================================= */
+
+const currentAQI = 142;
+const currentAQIStatus = "Moderate";
+
+const locationName = "Bengaluru, India";
+
+const longitude = "77.5946° E";
+const latitude = "12.9716° N";
+
+/* =========================================================
+   COMPONENT
+   ========================================================= */
+
 function Dashboard() {
-  // =====================================================
-  // STATE
-  // =====================================================
+  const navigate = useNavigate();
 
-  const [aqi, setAqi] = useState(null);
-  const [aqiCategory, setAqiCategory] = useState("");
+  /* =======================================================
+     NOTIFICATION STATE
+     ======================================================= */
 
-  const [temperature, setTemperature] = useState(null);
-  const [humidity, setHumidity] = useState(null);
+  const [showAirAlert, setShowAirAlert] = useState(false);
 
-  const [city, setCity] = useState("Bengaluru");
+  /* =======================================================
+     ENVIRONMENTAL DATA
+     ======================================================= */
 
-  const [location, setLocation] = useState(null);
-  const [locationLoading, setLocationLoading] = useState(false);
-  const [locationError, setLocationError] = useState("");
+  const [sensorData] = useState(defaultSensorData);
 
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  /* =======================================================
+     HISTORY STATE
+     ======================================================= */
 
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [historyRecords, setHistoryRecords] = useState([]);
 
-  // =====================================================
-  // LOAD LATEST READING ON MOUNT
-  // =====================================================
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const [totalPages, setTotalPages] = useState(1);
+
+  const [totalRecords, setTotalRecords] = useState(0);
+
+  const [historyLoading, setHistoryLoading] =
+    useState(false);
+
+  const [historyError, setHistoryError] =
+    useState("");
+
+  /* =======================================================
+     FETCH HISTORY FROM BACKEND
+     
+     Backend:
+     GET /api/history?page=1&limit=1
+     ======================================================= */
+
+  const fetchHistory = async (page = 1) => {
+    try {
+      setHistoryLoading(true);
+      setHistoryError("");
+
+      const response = await fetch(
+        `${API_BASE_URL}/api/history?page=${page}&limit=${HISTORY_LIMIT}`
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          `History API returned ${response.status}`
+        );
+      }
+
+      const data = await response.json();
+
+      console.log("Dashboard History Response:", data);
+
+      /*
+       * Backend may return:
+       *
+       * {
+       *   records: [],
+       *   total_records: 100,
+       *   total_pages: 10
+       * }
+       *
+       * OR:
+       *
+       * {
+       *   history: []
+       * }
+       *
+       * OR:
+       *
+       * {
+       *   data: []
+       * }
+       */
+
+      let records = [];
+
+      if (Array.isArray(data)) {
+        records = data;
+      }
+
+      else if (
+        Array.isArray(data?.records)
+      ) {
+        records = data.records;
+      }
+
+      else if (
+        Array.isArray(data?.history)
+      ) {
+        records = data.history;
+      }
+
+      else if (
+        Array.isArray(data?.data)
+      ) {
+        records = data.data;
+      }
+
+      else if (
+        Array.isArray(data?.items)
+      ) {
+        records = data.items;
+      }
+
+      /* ===================================================
+         NORMALIZE BACKEND RECORDS
+         =================================================== */
+
+      const normalizedRecords = records.map(
+        (record) => {
+          const rawDate =
+            record?.date ??
+            record?.created_at ??
+            record?.timestamp ??
+            "";
+
+          const rawTime =
+            record?.time ??
+            "";
+
+          let formattedDate =
+            rawDate;
+
+          let formattedTime =
+            rawTime;
+
+          /*
+           * If backend gives one timestamp,
+           * split it into date + time.
+           */
+
+          if (
+            rawDate &&
+            !rawTime
+          ) {
+            const dateObject =
+              new Date(rawDate);
+
+            if (
+              !Number.isNaN(
+                dateObject.getTime()
+              )
+            ) {
+              formattedDate =
+                dateObject.toLocaleDateString(
+                  "en-IN",
+                  {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                  }
+                );
+
+              formattedTime =
+                dateObject.toLocaleTimeString(
+                  "en-IN",
+                  {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  }
+                );
+            }
+          }
+
+          const aqi =
+            record?.aqi ??
+            record?.aqi_value ??
+            record?.average_aqi ??
+            record?.avg_aqi ??
+            0;
+
+          let status =
+            record?.status ??
+            record?.aqi_category ??
+            record?.category ??
+            "";
+
+          /*
+           * If backend does not provide status,
+           * calculate it from AQI.
+           */
+
+          if (!status) {
+            const numericAQI =
+              Number(aqi) || 0;
+
+            if (numericAQI <= 100) {
+              status = "Good";
+            }
+
+            else if (
+              numericAQI <= 200
+            ) {
+              status = "Moderate";
+            }
+
+            else if (
+              numericAQI <= 300
+            ) {
+              status = "Poor";
+            }
+
+            else if (
+              numericAQI <= 400
+            ) {
+              status = "Very Poor";
+            }
+
+            else {
+              status = "Severe";
+            }
+          }
+
+          return {
+            date:
+              formattedDate ||
+              "Unknown Date",
+
+            time:
+              formattedTime ||
+              "--",
+
+            source:
+              record?.source ??
+              record?.data_source ??
+              record?.device ??
+              "AirGuard",
+
+            aqi: String(aqi),
+
+            status,
+          };
+        }
+      );
+
+      setHistoryRecords(
+        normalizedRecords
+      );
+
+      /* ===================================================
+         TOTAL RECORDS
+         =================================================== */
+
+      const backendTotalRecords =
+        Number(
+          data?.total_records ??
+          data?.totalRecords ??
+          data?.count ??
+          data?.total ??
+          0
+        );
+
+      /*
+       * If backend gives total_records,
+       * use it.
+       *
+       * Otherwise use the current page length.
+       */
+
+      if (
+        backendTotalRecords > 0
+      ) {
+        setTotalRecords(
+          backendTotalRecords
+        );
+      }
+
+      else {
+        setTotalRecords(
+          normalizedRecords.length
+        );
+      }
+
+      /* ===================================================
+         TOTAL PAGES
+         =================================================== */
+
+      const backendTotalPages =
+        Number(
+          data?.total_pages ??
+          data?.totalPages ??
+          0
+        );
+
+      if (
+        backendTotalPages > 0
+      ) {
+        setTotalPages(
+          backendTotalPages
+        );
+      }
+
+      else if (
+        backendTotalRecords > 0
+      ) {
+        setTotalPages(
+          Math.ceil(
+            backendTotalRecords /
+              HISTORY_LIMIT
+          )
+        );
+      }
+
+      else {
+        /*
+         * If backend doesn't provide total pages,
+         * allow the pagination to continue while
+         * the current page is full.
+         */
+
+        const possibleNextPage =
+          normalizedRecords.length ===
+          HISTORY_LIMIT
+            ? page + 1
+            : page;
+
+        setTotalPages(
+          possibleNextPage
+        );
+      }
+    }
+
+    catch (error) {
+      console.error(
+        "History fetch error:",
+        error
+      );
+
+      /*
+       * Use fallback data so the dashboard
+       * still displays properly if backend
+       * is temporarily unavailable.
+       */
+
+      setHistoryError(
+        "Unable to fetch latest history from backend."
+      );
+
+      if (page >= 1) {
+        const fallbackStart = (page - 1) * HISTORY_LIMIT;
+        const fallbackEnd = fallbackStart + HISTORY_LIMIT;
+        const fallbackPage = fallbackHistoryRecords.slice(
+          fallbackStart,
+          fallbackEnd
+        );
+
+        setHistoryRecords(fallbackPage);
+        setTotalRecords(fallbackHistoryRecords.length);
+        setTotalPages(Math.ceil(fallbackHistoryRecords.length / HISTORY_LIMIT));
+      }
+    }
+
+    finally {
+      setHistoryLoading(false);
+    }
+  };
+
+  /* =======================================================
+     LOAD FIRST HISTORY PAGE
+     ======================================================= */
 
   useEffect(() => {
-    fetchAQI();
+    fetchHistory(1);
   }, []);
 
-  // =====================================================
-  // GET USER LOCATION
-  // =====================================================
+  /* =======================================================
+     CHANGE HISTORY PAGE
+     ======================================================= */
 
-  const getUserLocation = () => {
-    if (!navigator.geolocation) {
-      setLocationError(
-        "Geolocation is not supported by this browser."
-      );
+  const changePage = async (
+    page
+  ) => {
+    if (
+      page < 1 ||
+      page > totalPages ||
+      page === currentPage
+    ) {
       return;
     }
 
-    setLocationLoading(true);
-    setLocationError("");
-    setError("");
+    setCurrentPage(page);
 
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        const latitude = position.coords.latitude;
-        const longitude = position.coords.longitude;
+    await fetchHistory(page);
 
-        console.log("User latitude:", latitude);
-        console.log("User longitude:", longitude);
+    /*
+     * Scroll to Recent History section.
+     */
 
-        // Store location in frontend
-        setLocation({
-          latitude,
-          longitude,
-        });
-
-        setLocationLoading(false);
-
-        // Fetch latest AQI reading from backend
-        await fetchAQI();
-      },
-      (locationError) => {
-        console.error(
-          "Location permission/error:",
-          locationError
-        );
-
-        setLocationError(
-          "Unable to get your location. Please allow location access."
-        );
-
-        setLocationLoading(false);
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 0,
-      }
-    );
-  };
-
-  // =====================================================
-  // FETCH AQI FROM BACKEND
-  // =====================================================
-
-  const fetchAQI = async () => {
-    try {
-      setLoading(true);
-      setError("");
-
-      const data = await getCurrent();
-
-      console.log("Dashboard API data:", data);
-
-      // AQI
-      setAqi(data.aqi_value ?? null);
-      setAqiCategory(data.aqi_category ?? "");
-
-      // Environment
-      setTemperature(data.temperature ?? null);
-      setHumidity(data.humidity ?? null);
-
-      // Backend city
-      if (data.city) {
-        setCity(data.city);
-      }
-    } catch (err) {
-      console.error("AQI fetch failed:", err);
-
-      setError(
-        "Unable to connect to AirGuard backend."
+    const historySection =
+      document.getElementById(
+        "recent-history"
       );
-    } finally {
-      setLoading(false);
+
+    if (historySection) {
+      historySection.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
     }
   };
 
-  // =====================================================
-  // FEATURES
-  // =====================================================
+  /* =======================================================
+     PAGINATION BUTTONS
+     ======================================================= */
 
-  const features = [
-    {
-      icon: Activity,
-      title: "Live Monitoring",
-      description:
-        "Monitor your AirGuard sensors and environmental conditions in real time.",
-      path: "/live-monitoring",
-      label: "Monitor now",
-    },
-    {
-      icon: BarChart3,
-      title: "Analytics",
-      description:
-        "Explore air-quality trends and understand how pollution changes over time.",
-      path: "/analytics",
-      label: "View analytics",
-    },
-    {
-      icon: History,
-      title: "History",
-      description:
-        "Review previous sensor readings and discover important pollution patterns.",
-      path: "/history",
-      label: "View history",
-    },
-    {
-      icon: BrainCircuit,
-      title: "AI Prediction",
-      description:
-        "Use intelligent prediction to understand upcoming air-quality conditions.",
-      path: "/prediction",
-      label: "Predict",
-    },
-    {
-      icon: AlertTriangle,
-      title: "Smart Alerts",
-      description:
-        "Get notified when environmental conditions reach an unsafe level.",
-      path: "/alerts",
-      label: "View alerts",
-    },
-  ];
+  const getPaginationPages = () => {
+    const pages = [];
 
-  // =====================================================
-  // NAVIGATION
-  // =====================================================
+    /*
+     * Small number of pages.
+     */
 
-  const handleNavigation = (path) => {
-    window.location.href = path;
+    if (
+      totalPages <= 7
+    ) {
+      for (
+        let i = 1;
+        i <= totalPages;
+        i++
+      ) {
+        pages.push(i);
+      }
+
+      return pages;
+    }
+
+    /*
+     * Always show page 1.
+     */
+
+    pages.push(1);
+
+    /*
+     * Left ellipsis.
+     */
+
+    if (
+      currentPage > 4
+    ) {
+      pages.push("...");
+    }
+
+    /*
+     * Middle pages.
+     */
+
+    const start =
+      Math.max(
+        2,
+        currentPage - 1
+      );
+
+    const end =
+      Math.min(
+        totalPages - 1,
+        currentPage + 1
+      );
+
+    for (
+      let i = start;
+      i <= end;
+      i++
+    ) {
+      pages.push(i);
+    }
+
+    /*
+     * Right ellipsis.
+     */
+
+    if (
+      currentPage <
+      totalPages - 3
+    ) {
+      pages.push("...");
+    }
+
+    /*
+     * Always show last page.
+     */
+
+    pages.push(
+      totalPages
+    );
+
+    return pages;
   };
 
-  // =====================================================
-  // RENDER
-  // =====================================================
+  /* =======================================================
+     EXPORT HISTORY AS CSV
+     ======================================================= */
+
+  const exportHistoryCSV = () => {
+    if (
+      historyRecords.length === 0
+    ) {
+      alert(
+        "No history records available to export."
+      );
+
+      return;
+    }
+
+    const headers = [
+      "Date",
+      "Time",
+      "Source",
+      "AQI",
+      "Status",
+    ];
+
+    const csvRows = [];
+
+    /*
+     * HEADER
+     */
+
+    csvRows.push(
+      headers.join(",")
+    );
+
+    /*
+     * RECORDS
+     */
+
+    historyRecords.forEach(
+      (record) => {
+        const row = [
+          record.date,
+          record.time,
+          record.source,
+          record.aqi,
+          record.status,
+        ].map(
+          (value) => {
+            const text =
+              String(
+                value ?? ""
+              );
+
+            return `"${text.replace(
+              /"/g,
+              '""'
+            )}"`;
+          }
+        );
+
+        csvRows.push(
+          row.join(",")
+        );
+      }
+    );
+
+    /*
+     * CREATE CSV
+     */
+
+    const csvContent =
+      csvRows.join("\n");
+
+    const blob =
+      new Blob(
+        [csvContent],
+        {
+          type:
+            "text/csv;charset=utf-8;",
+        }
+      );
+
+    const url =
+      URL.createObjectURL(
+        blob
+      );
+
+    const link =
+      document.createElement(
+        "a"
+      );
+
+    link.href = url;
+
+    link.download =
+      "AirGuard_History.csv";
+
+    document.body.appendChild(
+      link
+    );
+
+    link.click();
+
+    document.body.removeChild(
+      link
+    );
+
+    URL.revokeObjectURL(
+      url
+    );
+  };
+
+  /* =======================================================
+     GO TO ANALYTICS PAGE
+     
+     IMPORTANT:
+     The Analytics component you provided should be
+     registered in App.jsx as:
+     
+     <Route path="/analytics" element={<Analytics />} />
+     ======================================================= */
+
+  const goToAnalytics = () => {
+    navigate("/analytics");
+  };
+
+  /* =======================================================
+     RENDER
+     ======================================================= */
 
   return (
-    <div className="airguard-dashboard">
+    <div className="dashboard-page">
 
-      {/* =================================================
-          BACKGROUND ANIMATION
-      ================================================= */}
+      {/* ===================================================
+          BACKGROUND DECORATION
+          =================================================== */}
 
-      <div className="dashboard-orb orb-one"></div>
-      <div className="dashboard-orb orb-two"></div>
+      <div className="dashboard-bg-circle circle-one"></div>
 
-      {/* =================================================
-          MOBILE MENU
-      ================================================= */}
+      <div className="dashboard-bg-circle circle-two"></div>
 
-      <div
-        className={`mobile-menu-panel ${
-          menuOpen ? "mobile-menu-open" : ""
-        }`}
-      ></div>
+      <div className="dashboard-leaf leaf-one">
+        <Leaf size={20} />
+      </div>
 
-      {/* =================================================
-          MAIN
-      ================================================= */}
+      <div className="dashboard-leaf leaf-two">
+        <Leaf size={17} />
+      </div>
 
-      <main className="dashboard-content">
 
-        {/* =================================================
-            WELCOME SECTION
-        ================================================= */}
+      {/* ===================================================
+          HEADER
+          =================================================== */}
 
-        <section className="dashboard-welcome">
+      <header className="dashboard-header">
 
-          <div>
+        {/* AIRGUARD BRAND */}
 
-            <span className="welcome-label">
-              AIRGUARD MONITORING PLATFORM
+        <div className="airguard-brand">
+
+          <div className="airguard-logo">
+
+            <ShieldCheck
+              size={25}
+              strokeWidth={2.4}
+            />
+
+          </div>
+
+          <div className="airguard-brand-text">
+
+            <h2>
+              AirGuard
+            </h2>
+
+            <span>
+              Breathe Clean, Live Healthy
             </span>
 
-            <h1>
-              Monitor Air Quality.
-              <br />
+          </div>
+
+        </div>
+
+
+        {/* RIGHT SIDE */}
+
+        <div className="dashboard-header-right">
+
+          {/* LOCATION */}
+
+          <div className="dashboard-location">
+
+            <MapPin
+              size={18}
+              strokeWidth={2}
+            />
+
+            <div className="location-details">
+
+              <strong>
+                {locationName}
+              </strong>
 
               <span>
-                Protect Your Health.
+                {longitude} / {latitude}
               </span>
-            </h1>
-
-            <p>
-              Intelligent environmental monitoring,
-              prediction and health insights designed
-              to help you breathe safer.
-            </p>
-
-          </div>
-
-        </section>
-
-        {/* =================================================
-            HERO CARDS
-        ================================================= */}
-
-        <section className="dashboard-hero-grid">
-
-          {/* =================================================
-              INTRO CARD
-          ================================================= */}
-
-          <div className="intro-card">
-
-            <div className="intro-glow"></div>
-
-            <div className="intro-content">
-
-              <span className="card-label">
-                REAL-TIME AIR QUALITY MONITORING
-              </span>
-
-              <h2>
-                Smarter monitoring.
-                <br />
-
-                <span>
-                  Healthier decisions.
-                </span>
-              </h2>
-
-              <p>
-                AirGuard combines environmental sensors
-                and intelligent analysis to help you
-                understand the air around you.
-              </p>
-
-              <div className="intro-buttons">
-
-                <button
-                  className="primary-button"
-                  onClick={() =>
-                    handleNavigation("/dashboard")
-                  }
-                >
-                  View Dashboard
-
-                  <ArrowUpRight size={16} />
-                </button>
-
-                <button
-                  className="secondary-button"
-                  onClick={() =>
-                    document
-                      .getElementById("airguard-features")
-                      ?.scrollIntoView({
-                        behavior: "smooth",
-                      })
-                  }
-                >
-                  Explore Features
-                </button>
-
-              </div>
-
-            </div>
-
-            {/* Decorative environmental circles */}
-
-            <div className="intro-decoration">
-
-              <div className="leaf-circle circle-one"></div>
-
-              <div className="leaf-circle circle-two"></div>
-
-              <div className="leaf-circle circle-three"></div>
-
-              <div className="floating-leaf">
-                ✦
-              </div>
 
             </div>
 
           </div>
 
+
           {/* =================================================
-              AQI CARD
-          ================================================= */}
-
-          <div className="aqi-card">
-
-            <div className="aqi-card-header">
-
-              <div>
-
-                <span className="card-label">
-                  LIVE AIR QUALITY INDEX
-                </span>
-
-                <div className="aqi-location">
-
-                  <MapPin size={14} />
-
-                  {city}, India
-
-                </div>
-
-              </div>
-
-              {/* LOCATION BUTTON */}
-
-              <button
-                type="button"
-                className="live-status"
-                onClick={getUserLocation}
-                disabled={locationLoading}
-                title="Get your current location"
-              >
-
-                <span></span>
-
-                {locationLoading
-                  ? "LOCATING..."
-                  : "LOCATION"}
-
-              </button>
-
-            </div>
-
-            {/* =================================================
-                LOCATION STATUS
-            ================================================= */}
-
-            {location && (
-              <div
-                style={{
-                  fontSize: "11px",
-                  marginTop: "8px",
-                  opacity: 0.7,
-                }}
-              >
-                📍 Location detected
-              </div>
-            )}
-
-            {locationError && (
-              <div
-                style={{
-                  fontSize: "12px",
-                  marginTop: "8px",
-                  color: "#d9534f",
-                }}
-              >
-                {locationError}
-              </div>
-            )}
-
-            <div className="aqi-main">
-
-              {/* AQI VALUE */}
-
-              <div className="aqi-number-area">
-
-                <span className="aqi-number">
-
-                  {loading
-                    ? "..."
-                    : aqi !== null
-                    ? aqi.toFixed(1)
-                    : "--"}
-
-                </span>
-
-                <div className="aqi-status">
-
-                  <span></span>
-
-                  {aqiCategory || "--"}
-
-                </div>
-
-                <p>
-
-                  {aqiCategory === "Good"
-                    ? "Air quality is satisfactory and poses little or no risk."
-                    : aqiCategory === "Moderate"
-                    ? "Air quality is acceptable, but sensitive groups should take care."
-                    : aqiCategory === "Poor"
-                    ? "Air quality may affect health. Consider reducing prolonged exposure."
-                    : aqiCategory === "Very Poor"
-                    ? "Health effects are possible. Avoid prolonged outdoor exposure."
-                    : aqiCategory === "Severe"
-                    ? "Air quality is hazardous. Avoid outdoor exposure."
-                    : "Waiting for air-quality data."}
-
-                </p>
-
-              </div>
-
-              {/* =================================================
-                  GAUGE
+              NOTIFICATION
               ================================================= */}
 
-              <div className="aqi-gauge">
+          <div className="air-alert-wrapper">
 
-                <svg viewBox="0 0 180 180">
+            <button
+              type="button"
+              className={`air-alert-button ${
+                showAirAlert
+                  ? "active"
+                  : ""
+              }`}
+              onClick={() =>
+                setShowAirAlert(
+                  (previous) =>
+                    !previous
+                )
+              }
+              aria-label="Air quality notification"
+            >
 
-                  <circle
-                    cx="90"
-                    cy="90"
-                    r="68"
-                    className="gauge-track"
-                  />
+              <Bell
+                size={21}
+                strokeWidth={2}
+              />
 
-                  <circle
-                    cx="90"
-                    cy="90"
-                    r="68"
-                    className="gauge-value"
-                  />
+              <span className="air-alert-badge">
+                1
+              </span>
 
-                </svg>
+            </button>
 
-                <div className="gauge-center">
 
-                  <strong>
-                    AQI
-                  </strong>
+            {/* =================================================
+                ALERT POPUP
+                Hidden initially
+                ================================================= */}
 
-                  <span>
-                    0 — 500
+            {showAirAlert && (
+
+              <div className="air-alert-panel">
+
+                <div className="air-alert-panel-header">
+
+                  <div className="air-alert-title">
+
+                    <div className="air-alert-small-icon">
+
+                      <Bell
+                        size={16}
+                        strokeWidth={2.2}
+                      />
+
+                    </div>
+
+                    <div>
+
+                      <h3>
+                        Air Quality Alert
+                      </h3>
+
+                      <span>
+                        Current air quality status
+                      </span>
+
+                    </div>
+
+                  </div>
+
+
+                  <button
+                    type="button"
+                    className="air-alert-close"
+                    onClick={() =>
+                      setShowAirAlert(
+                        false
+                      )
+                    }
+                    aria-label="Close alert"
+                  >
+
+                    <X size={16} />
+
+                  </button>
+
+                </div>
+
+
+                <div className="air-alert-panel-content">
+
+                  <div className="alert-aqi-number">
+                    {currentAQI}
+                  </div>
+
+                  <div className="alert-aqi-details">
+
+                    <strong>
+                      {currentAQI} —{" "}
+                      {currentAQIStatus}
+                    </strong>
+
+                    <p>
+                      Current air quality
+                      requires continued
+                      monitoring.
+                    </p>
+
+                  </div>
+
+                </div>
+
+
+                <div className="air-alert-panel-footer">
+
+                  <span className="alert-status-dot"></span>
+
+                  Current Air Quality
+
+                  <span className="alert-time">
+                    Just now
                   </span>
 
                 </div>
 
               </div>
 
-            </div>
+            )}
 
-            {/* =================================================
-                SENSOR SUMMARY
+          </div>
+
+        </div>
+
+      </header>
+
+
+      {/* ===================================================
+          HERO + AQI
+          =================================================== */}
+
+      <section className="dashboard-intro">
+
+        {/* HERO */}
+
+        <div className="intro-content">
+
+          <div className="small-heading">
+
+            CLEANER AIR
+
+            <span>
+              •
+            </span>
+
+            HEALTHIER TOMORROW
+
+          </div>
+
+
+          <h1>
+
+            Monitor Air Quality.
+
+            <br />
+
+            <span>
+              Protect Your Health.
+            </span>
+
+          </h1>
+
+
+          <p>
+            Real-time air quality monitoring
+            and intelligent insights
+            <br />
+            designed to help you breathe safer.
+          </p>
+
+        </div>
+
+
+        {/* =================================================
+            LIVE AQI CARD
             ================================================= */}
 
-            <div className="sensor-summary">
+        <div className="aqi-card">
 
-              <div className="mini-sensor">
+          <div className="card-heading">
 
-                <span>
-                  MQ-2
-                </span>
+            <span className="heading-icon">
 
-                <strong>
-                  --
-                </strong>
+              <MapPin size={17} />
 
-                <small>
-                  Gas / Smoke
-                </small>
-
-              </div>
-
-              <div className="mini-sensor">
-
-                <span>
-                  MQ-7
-                </span>
-
-                <strong>
-                  --
-                </strong>
-
-                <small>
-                  CO
-                </small>
-
-              </div>
-
-              <div className="mini-sensor">
-
-                <span>
-                  MQ-135
-                </span>
-
-                <strong>
-                  --
-                </strong>
-
-                <small>
-                  Air Quality
-                </small>
-
-              </div>
-
-              <div className="mini-sensor">
-
-                <span>
-                  DHT22
-                </span>
-
-                <strong>
-
-                  {humidity !== null
-                    ? `${humidity.toFixed(1)}%`
-                    : "--"}
-
-                </strong>
-
-                <small>
-                  Humidity
-                </small>
-
-              </div>
-
-            </div>
-
-          </div>
-
-        </section>
-
-        {/* =================================================
-            QUICK ENVIRONMENT
-        ================================================= */}
-
-        <section className="environment-row">
-
-          {/* TEMPERATURE */}
-
-          <div className="environment-card">
-
-            <div className="environment-icon">
-
-              <Thermometer size={18} />
-
-            </div>
+            </span>
 
             <div>
-
-              <span>
-                Temperature
-              </span>
-
-              <strong>
-
-                {temperature !== null
-                  ? `${temperature.toFixed(1)}°C`
-                  : "--"}
-
-              </strong>
-
-            </div>
-
-          </div>
-
-          {/* HUMIDITY */}
-
-          <div className="environment-card">
-
-            <div className="environment-icon">
-
-              <Droplets size={18} />
-
-            </div>
-
-            <div>
-
-              <span>
-                Humidity
-              </span>
-
-              <strong>
-
-                {humidity !== null
-                  ? `${humidity.toFixed(1)}%`
-                  : "--"}
-
-              </strong>
-
-            </div>
-
-          </div>
-</section>
-
-        {/* =================================================
-            ERROR MESSAGE
-        ================================================= */}
-
-        {error && (
-
-          <div className="dashboard-error">
-
-            <strong>
-              Backend Connection Problem
-            </strong>
-
-            <p>
-              {error}
-            </p>
-
-          </div>
-
-        )}
-
-        {/* =================================================
-            FEATURES
-        ================================================= */}
-
-        <section
-          className="features-section"
-          id="airguard-features"
-        >
-
-          <div className="features-heading">
-
-            <div>
-
-              <span className="welcome-label">
-                AIRGUARD FEATURES
-              </span>
 
               <h2>
-                Everything you need
-                <br />
-
-                <span>
-                  to breathe safer.
-                </span>
-
+                Live Air Quality Index
               </h2>
+
+              <p>
+                Bengaluru, India
+              </p>
 
             </div>
 
-            <p>
-              Intelligent monitoring, prediction
-              and insights in one place.
-            </p>
+          </div>
+
+
+          <div className="aqi-content">
+
+            {/* AQI CIRCLE */}
+
+            <div className="aqi-circle">
+
+              <div className="aqi-inner">
+
+                <span className="aqi-label">
+                  AQI
+                </span>
+
+                <strong>
+                  {currentAQI}
+                </strong>
+
+                <span className="aqi-status">
+                  {currentAQIStatus}
+                </span>
+
+              </div>
+
+            </div>
+
+
+            <div className="aqi-divider"></div>
+
+
+            {/* AQI MESSAGE */}
+
+            <div className="aqi-message">
+
+              <div className="message-icon">
+
+                <Leaf size={20} />
+
+              </div>
+
+              <div>
+
+                <span>
+                  Air Quality
+                </span>
+
+                <strong>
+                  is {currentAQIStatus}
+                </strong>
+
+                <p>
+                  Keep monitoring
+                  <br />
+                  for better health.
+                </p>
+
+              </div>
+
+            </div>
 
           </div>
 
-          <div className="features-grid">
+        </div>
 
-            {features.map((feature, index) => {
+      </section>
 
-              const Icon = feature.icon;
 
-              return (
+      {/* ===================================================
+          MAIN GRID
+          =================================================== */}
+
+      <section className="dashboard-grid">
+
+
+        {/* =================================================
+            ENVIRONMENTAL READINGS
+            ================================================= */}
+
+        <div className="dashboard-card environment-card">
+
+          <div className="section-header">
+
+            <div className="section-title">
+
+              <div className="section-icon green-icon">
+
+                <Leaf size={20} />
+
+              </div>
+
+              <div>
+
+                <h2>
+                  Environmental Readings
+                </h2>
+
+                <p>
+                  Current air quality parameters
+                  from your environment.
+                </p>
+
+              </div>
+
+            </div>
+
+
+            <div className="live-data">
+
+              <span></span>
+
+              Live Data
+
+            </div>
+
+          </div>
+
+
+          <div className="sensor-grid">
+
+            {sensorData.map(
+              (
+                sensor,
+                index
+              ) => (
 
                 <div
-                  className="feature-card"
-                  key={feature.title}
-                  style={{
-                    animationDelay:
-                      `${index * 0.1}s`,
-                  }}
-                  onClick={() =>
-                    handleNavigation(feature.path)
-                  }
+                  className="sensor-box"
+                  key={index}
                 >
 
-                  <div className="feature-top">
+                  <div
+                    className={`sensor-icon ${sensor.type}`}
+                  >
+                    {sensor.icon}
+                  </div>
 
-                    <div className="feature-icon">
 
-                      <Icon size={21} />
+                  <div className="sensor-info">
+
+                    <h3>
+                      {sensor.name}
+                    </h3>
+
+
+                    <div className="sensor-value">
+
+                      <strong>
+                        {sensor.value}
+                      </strong>
+
+                      <span>
+                        {sensor.unit}
+                      </span>
 
                     </div>
 
-                    <ArrowUpRight
-                      size={17}
-                      className="feature-arrow"
-                    />
 
-                  </div>
+                    <div
+                      className={`sensor-status ${sensor.type}`}
+                    >
 
-                  <div className="feature-content">
+                      <span></span>
 
-                    <h3>
-                      {feature.title}
-                    </h3>
+                      {sensor.status}
 
-                    <p>
-                      {feature.description}
-                    </p>
-
-                  </div>
-
-                  <div className="feature-link">
-
-                    {feature.label}
-
-                    <ArrowUpRight size={13} />
+                    </div>
 
                   </div>
 
                 </div>
 
-              );
-
-            })}
+              )
+            )}
 
           </div>
 
-        </section>
+        </div>
 
-      </main>
+
+        {/* =================================================
+            DATA SOURCES
+            ================================================= */}
+
+        <div className="dashboard-card sources-card">
+
+          <div className="section-header">
+
+            <div className="section-title">
+
+              <div className="section-icon green-icon">
+
+                <Database size={20} />
+
+              </div>
+
+              <div>
+
+                <h2>
+                  Data Sources
+                </h2>
+
+                <p>
+                  Fetch data from external sources
+                  and local database
+                </p>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <div className="source-list">
+
+
+            {/* =================================================
+                PMS SENSOR
+                ================================================= */}
+
+            <div className="source-box">
+
+              <div className="source-left">
+
+                <div className="source-icon">
+
+                  <Leaf size={21} />
+
+                </div>
+
+                <div>
+
+                  <h3>
+                    PMS Sensor
+                  </h3>
+
+                  <p>
+                    External PMS5003 dataset
+                    for air quality data.
+                  </p>
+
+                </div>
+
+              </div>
+
+
+              <button
+                className="fetch-button"
+                type="button"
+              >
+
+                <Download size={15} />
+
+                FETCH PMS DATA
+
+              </button>
+
+
+              <div className="source-bottom">
+
+                <span className="connected-status">
+
+                  <span></span>
+
+                  Status: Ready
+
+                </span>
+
+
+                <span className="last-fetched">
+
+                  <Clock3 size={12} />
+
+                  Last fetched: --
+
+                </span>
+
+              </div>
+
+            </div>
+
+
+            {/* =================================================
+                XAMPP / MYSQL
+                ================================================= */}
+
+            <div className="source-box">
+
+              <div className="source-left">
+
+                <div className="source-icon">
+
+                  <Database size={21} />
+
+                </div>
+
+                <div>
+
+                  <h3>
+                    XAMPP / MySQL
+                  </h3>
+
+                  <p>
+                    Local MySQL database
+                    for sensor data.
+                  </p>
+
+                </div>
+
+              </div>
+
+
+              <button
+                className="fetch-button"
+                type="button"
+              >
+
+                <Database size={15} />
+
+                FETCH FROM SQL
+
+              </button>
+
+
+              <div className="source-bottom">
+
+                <span className="connected-status">
+
+                  <span></span>
+
+                  Status: Connected
+
+                </span>
+
+
+                <span className="last-fetched">
+
+                  <Clock3 size={12} />
+
+                  Last fetched: --
+
+                </span>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        {/* =================================================
+            AI PREDICTION
+            ================================================= */}
+
+        <div className="dashboard-card ai-card">
+
+          <div className="ai-content">
+
+            <div className="ai-icon">
+
+              <BrainCircuit
+                size={28}
+              />
+
+            </div>
+
+
+            <div className="ai-text">
+
+              <h2>
+                AI Prediction
+              </h2>
+
+              <p>
+                Use sensor and environmental
+                data
+                <br />
+                for accurate AQI prediction.
+              </p>
+
+
+              {/* =================================================
+                  IMPORTANT:
+                  NOW NAVIGATES TO ANALYTICS PAGE
+                  ================================================= */}
+
+              <button
+                className="prediction-button"
+                type="button"
+                onClick={goToAnalytics}
+              >
+
+                Go to AI Prediction
+
+                <span>
+                  →
+                </span>
+
+              </button>
+
+            </div>
+
+          </div>
+
+
+          {/* DECORATIVE CHART */}
+
+          <div className="ai-chart">
+
+            <div className="chart-line"></div>
+
+            <div className="chart-bars">
+
+              <span></span>
+              <span></span>
+              <span></span>
+              <span></span>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        {/* =================================================
+            RECENT HISTORY
+            ================================================= */}
+
+        <div
+          className="dashboard-card history-card"
+          id="recent-history"
+        >
+
+          {/* HISTORY HEADER */}
+
+          <div className="history-header">
+
+            <div className="section-title">
+
+              <div className="section-icon history-icon">
+
+                <Clock3 size={20} />
+
+              </div>
+
+              <div>
+
+                <h2>
+                  Recent History
+                </h2>
+
+                <p>
+                  Latest fetched records from your
+                  system.
+                </p>
+
+              </div>
+
+            </div>
+
+
+            {/* EXPORT CSV */}
+
+            <button
+              type="button"
+              className="export-csv-button"
+              onClick={
+                exportHistoryCSV
+              }
+              title="Export history records as CSV"
+            >
+
+              <Download size={15} />
+
+              <span>
+                Export CSV
+              </span>
+
+            </button>
+
+          </div>
+
+
+          {/* =================================================
+              ERROR MESSAGE
+              ================================================= */}
+
+          {historyError && (
+
+            <div
+              className="history-error"
+              style={{
+                marginBottom:
+                  "12px",
+                padding:
+                  "10px 14px",
+                borderRadius:
+                  "8px",
+                background:
+                  "#fff7ed",
+                color:
+                  "#b45309",
+                fontSize:
+                  "13px",
+              }}
+            >
+
+              {historyError}
+
+            </div>
+
+          )}
+
+
+          {/* =================================================
+              TABLE
+              ================================================= */}
+
+          <div className="history-table-wrapper">
+
+            <div className="history-table-head">
+
+              <span>
+                Date & Time
+              </span>
+
+              <span>
+                Source
+              </span>
+
+              <span>
+                AQI
+              </span>
+
+              <span>
+                Status
+              </span>
+
+            </div>
+
+
+            {/* =================================================
+                LOADING
+                ================================================= */}
+
+            {historyLoading ? (
+
+              <div
+                className="history-loading"
+                style={{
+                  padding:
+                    "35px",
+                  textAlign:
+                    "center",
+                  color:
+                    "#6d7478",
+                }}
+              >
+
+                Loading history...
+
+              </div>
+
+            ) : historyRecords.length === 0 ? (
+
+              <div
+                className="history-loading"
+                style={{
+                  padding:
+                    "35px",
+                  textAlign:
+                    "center",
+                  color:
+                    "#6d7478",
+                }}
+              >
+
+                No history records available.
+
+              </div>
+
+            ) : (
+
+              <div className="history-records">
+
+                {historyRecords.map(
+                  (
+                    record,
+                    index
+                  ) => (
+
+                    <div
+                      className="history-row"
+                      key={`${record.date}-${record.time}-${record.source}-${index}`}
+                    >
+
+                      {/* DATE + TIME */}
+
+                      <div className="record-date">
+
+                        <strong>
+                          {record.date}
+                        </strong>
+
+                        <span>
+                          {record.time}
+                        </span>
+
+                      </div>
+
+
+                      {/* SOURCE */}
+
+                      <div className="record-source">
+
+                        {record.source}
+
+                      </div>
+
+
+                      {/* AQI */}
+
+                      <div className="record-aqi">
+
+                        {record.aqi}
+
+                      </div>
+
+
+                      {/* STATUS */}
+
+                      <div
+                        className={`record-status ${
+                          record.status
+                            ?.toLowerCase()
+                            .replace(
+                              /\s+/g,
+                              "-"
+                            )
+                        }`}
+                      >
+
+                        <span></span>
+
+                        {record.status}
+
+                      </div>
+
+                    </div>
+
+                  )
+                )}
+
+              </div>
+
+            )}
+
+          </div>
+
+
+          {/* =================================================
+              PAGINATION
+              ================================================= */}
+
+          <div className="pagination-container">
+
+            {/* RECORD COUNT */}
+
+            <div className="record-count">
+
+              {totalRecords > 0 ? (
+
+                <>
+                  Showing{" "}
+
+                  <strong>
+                    {(
+                      (currentPage - 1) *
+                        HISTORY_LIMIT
+                    ) + 1}
+
+                    -
+
+                    {Math.min(
+                      currentPage *
+                        HISTORY_LIMIT,
+                      totalRecords
+                    )}
+                  </strong>
+
+                  {" "}of{" "}
+
+                  <strong>
+                    {totalRecords}
+                  </strong>
+
+                  {" "}records
+                </>
+
+              ) : (
+
+                <>
+                  Page{" "}
+
+                  <strong>
+                    {currentPage}
+                  </strong>
+                </>
+
+              )}
+
+            </div>
+
+
+            {/* PAGINATION */}
+
+            <div className="pagination">
+
+
+              {/* PREVIOUS */}
+
+              <button
+                type="button"
+                className="page-arrow"
+                disabled={
+                  currentPage === 1 ||
+                  historyLoading
+                }
+                onClick={() =>
+                  changePage(
+                    currentPage - 1
+                  )
+                }
+                aria-label="Previous page"
+              >
+
+                <ChevronLeft
+                  size={15}
+                />
+
+              </button>
+
+
+              {/* PAGE NUMBERS */}
+
+              {getPaginationPages().map(
+                (
+                  page,
+                  index
+                ) => {
+
+                  /*
+                   * ELLIPSIS
+                   */
+
+                  if (
+                    page === "..."
+                  ) {
+
+                    return (
+
+                      <span
+                        className="page-dots"
+                        key={`dots-${index}`}
+                      >
+                        ...
+                      </span>
+
+                    );
+                  }
+
+
+                  /*
+                   * PAGE NUMBER
+                   */
+
+                  return (
+
+                    <button
+                      type="button"
+                      key={page}
+                      className={`page-number ${
+                        currentPage === page
+                          ? "active"
+                          : ""
+                      }`}
+                      disabled={
+                        historyLoading
+                      }
+                      onClick={() =>
+                        changePage(
+                          page
+                        )
+                      }
+                    >
+
+                      {page}
+
+                    </button>
+
+                  );
+
+                }
+              )}
+
+
+              {/* NEXT */}
+
+              <button
+                type="button"
+                className="page-arrow"
+                disabled={
+                  currentPage >=
+                    totalPages ||
+                  historyLoading
+                }
+                onClick={() =>
+                  changePage(
+                    currentPage + 1
+                  )
+                }
+                aria-label="Next page"
+              >
+
+                <ChevronRight
+                  size={15}
+                />
+
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
 
     </div>
   );
 }
 
 export default Dashboard;
-
