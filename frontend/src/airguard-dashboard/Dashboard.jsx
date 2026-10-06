@@ -627,7 +627,12 @@ function Dashboard() {
 
         setHistoryRecords(fallbackPage);
         setTotalRecords(fallbackHistoryRecords.length);
-        setTotalPages(Math.ceil(fallbackHistoryRecords.length / HISTORY_LIMIT));
+        setTotalPages(
+          Math.ceil(
+            fallbackHistoryRecords.length /
+              HISTORY_LIMIT
+          )
+        );
       }
     }
 
@@ -879,17 +884,11 @@ function Dashboard() {
   };
 
   /* =======================================================
-     GO TO ANALYTICS PAGE
-     
-     IMPORTANT:
-     The Analytics component you provided should be
-     registered in App.jsx as:
-     
-     <Route path="/analytics" element={<Analytics />} />
+     GO TO AI PREDICTION PAGE
      ======================================================= */
 
-  const goToAnalytics = () => {
-    navigate("/analytics");
+  const goToPrediction = () => {
+    navigate("/prediction");
   };
 
   /* =======================================================
@@ -1571,14 +1570,13 @@ function Dashboard() {
 
 
               {/* =================================================
-                  IMPORTANT:
-                  NOW NAVIGATES TO ANALYTICS PAGE
+                  GO TO AI PREDICTION PAGE
                   ================================================= */}
 
               <button
                 className="prediction-button"
                 type="button"
-                onClick={goToAnalytics}
+                onClick={goToPrediction}
               >
 
                 Go to AI Prediction
@@ -1897,6 +1895,7 @@ function Dashboard() {
                   <strong>
                     {currentPage}
                   </strong>
+
                 </>
 
               )}
