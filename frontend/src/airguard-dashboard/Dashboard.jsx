@@ -21,7 +21,7 @@ import "./Dashboard.css";
    API CONFIGURATION
    ========================================================= */
 
-const API_BASE_URL = "http://127.0.0.1:8000";
+import { API_BASE_URL, fetchPMSData, fetchSQLData } from "../services/api";
 
 /* =========================================================
    HISTORY CONFIGURATION
@@ -260,14 +260,6 @@ const fallbackHistoryRecords = [
    CURRENT AIR QUALITY
    ========================================================= */
 
-const currentAQI = 142;
-const currentAQIStatus = "Moderate";
-
-const locationName = "Bengaluru, India";
-
-const longitude = "77.5946° E";
-const latitude = "12.9716° N";
-
 /* =========================================================
    COMPONENT
    ========================================================= */
@@ -285,7 +277,132 @@ function Dashboard() {
      ENVIRONMENTAL DATA
      ======================================================= */
 
-  const [sensorData] = useState(defaultSensorData);
+  const [sensorData, setSensorData] = useState(defaultSensorData);
+
+  /* =======================================================
+     LIVE CURRENT DATA  (GET /api/current, refreshed every 10s)
+     ======================================================= */
+
+  const [currentAQI, setCurrentAQI] = useState("--");
+  const [currentAQIStatus, setCurrentAQIStatus] = useState("No data");
+  const [locationName, setLocationName] = useState("Location unavailable");
+  const [latitude, setLatitude] = useState("--");
+  const [longitude, setLongitude] = useState("--");
+
+  const formatCoord = (value, positive, negative) => {
+    const n = Number(value);
+    if (value === null || value === undefined || Number.isNaN(n)) return "--";
+    return `${Math.abs(n).toFixed(4)}° ${n >= 0 ? positive : negative}`;
+  };
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadCurrent = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/current`);
+
+        if (!response.ok) {
+          throw new Error(`Current API returned ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        // Backend returns { message: "No readings yet" } on an empty DB
+        if (cancelled || data?.aqi_value === undefined) return;
+
+        setCurrentAQI(Math.round(Number(data.aqi_value)));
+        setCurrentAQIStatus(data.aqi_category || "Unknown");
+
+        if (data.city) setLocationName(data.city);
+        setLatitude(formatCoord(data.latitude, "N", "S"));
+        setLongitude(formatCoord(data.longitude, "E", "W"));
+
+        const liveValues = {
+          "CO": [data.co, 2],
+          "NH₃": [data.nh3, 2],
+          "NO₂": [data.no2, 2],
+          "NOx": [data.nox, 2],
+          "°": [data.temperature, 1],
+          "%": [data.humidity, 0],
+        };
+
+        setSensorData((previous) =>
+          previous.map((item) => {
+            const entry = liveValues[item.icon];
+            if (!entry || entry[0] === null || entry[0] === undefined) {
+              return item;
+            }
+            return { ...item, value: Number(entry[0]).toFixed(entry[1]) };
+          })
+        );
+      } catch (error) {
+        console.error("Current data fetch error:", error);
+      }
+    };
+
+    loadCurrent();
+    const timer = setInterval(loadCurrent, 10000);
+
+    return () => {
+      cancelled = true;
+      clearInterval(timer);
+    };
+  }, []);
+
+  /* =======================================================
+     DATA SOURCES  (FETCH PMS DATA / FETCH FROM SQL)
+     ======================================================= */
+
+  const [pmsData, setPmsData] = useState(null);
+  const [pmsStatus, setPmsStatus] = useState("Ready");
+  const [pmsError, setPmsError] = useState("");
+  const [pmsFetchedAt, setPmsFetchedAt] = useState("--");
+
+  const [sqlData, setSqlData] = useState(null);
+  const [sqlStatus, setSqlStatus] = useState("Ready");
+  const [sqlError, setSqlError] = useState("");
+  const [sqlFetchedAt, setSqlFetchedAt] = useState("--");
+
+  const nowLabel = () =>
+    new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+
+  const handleFetchPMS = async () => {
+    setPmsStatus("Fetching...");
+    setPmsError("");
+    try {
+      setPmsData(await fetchPMSData());
+      setPmsStatus("Fetched");
+      setPmsFetchedAt(nowLabel());
+    } catch (error) {
+      setPmsData(null);
+      setPmsStatus("Error");
+      setPmsError(error.message);
+    }
+  };
+
+  const handleFetchSQL = async () => {
+    setSqlStatus("Fetching...");
+    setSqlError("");
+    try {
+      setSqlData(await fetchSQLData());
+      setSqlStatus("Connected");
+      setSqlFetchedAt(nowLabel());
+    } catch (error) {
+      setSqlData(null);
+      setSqlStatus("Error");
+      setSqlError(error.message);
+    }
+  };
+
+  const resultBoxStyle = {
+    margin: "10px 0 0",
+    padding: "10px 12px",
+    borderRadius: "10px",
+    border: "1px solid rgba(127,127,127,0.25)",
+    fontSize: "12px",
+    lineHeight: 1.6,
+  };
 
   /* =======================================================
      HISTORY STATE
@@ -1435,6 +1552,8 @@ function Dashboard() {
               <button
                 className="fetch-button"
                 type="button"
+                onClick={handleFetchPMS}
+                disabled={pmsStatus === "Fetching..."}
               >
 
                 <Download size={15} />
@@ -1443,6 +1562,20 @@ function Dashboard() {
 
               </button>
 
+              {pmsError && (
+                <p style={{ ...resultBoxStyle, color: "#dc2626" }}>{pmsError}</p>
+              )}
+
+              {pmsData && (
+                <div style={resultBoxStyle}>
+                  <strong>External data - not measured by the AirGuard mask</strong>
+                  <div>City: {pmsData.city}</div>
+                  <div>Date: {pmsData.date}</div>
+                  <div>PM2.5: {pmsData.pm2_5} {pmsData.unit}</div>
+                  <div>PM10: {pmsData.pm10} {pmsData.unit}</div>
+                </div>
+              )}
+
 
               <div className="source-bottom">
 
@@ -1450,7 +1583,7 @@ function Dashboard() {
 
                   <span></span>
 
-                  Status: Ready
+                  Status: {pmsStatus}
 
                 </span>
 
@@ -1459,7 +1592,7 @@ function Dashboard() {
 
                   <Clock3 size={12} />
 
-                  Last fetched: --
+                  Last fetched: {pmsFetchedAt}
 
                 </span>
 
@@ -1501,6 +1634,8 @@ function Dashboard() {
               <button
                 className="fetch-button"
                 type="button"
+                onClick={handleFetchSQL}
+                disabled={sqlStatus === "Fetching..."}
               >
 
                 <Database size={15} />
@@ -1509,6 +1644,39 @@ function Dashboard() {
 
               </button>
 
+              {sqlError && (
+                <p style={{ ...resultBoxStyle, color: "#dc2626" }}>{sqlError}</p>
+              )}
+
+              {sqlData && (
+                <div style={resultBoxStyle}>
+                  <strong>Real hardware reading (ESP32 via XAMPP/MySQL)</strong>
+
+                  {Object.entries(sqlData.reading || {}).map(([key, value]) => {
+                    const labels = {
+                      id: "Record ID",
+                      mq2: "MQ-2 (raw)",
+                      mq7: "MQ-7 (raw)",
+                      mq135: "MQ-135 (raw)",
+                      temperature: "Temperature (°C)",
+                      humidity: "Humidity (%)",
+                      created_at: "Recorded at",
+                    };
+
+                    const display =
+                      key === "created_at"
+                        ? new Date(value).toLocaleString()
+                        : String(value);
+
+                    return (
+                      <div key={key}>
+                        {labels[key] || key}: {display}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
 
               <div className="source-bottom">
 
@@ -1516,7 +1684,7 @@ function Dashboard() {
 
                   <span></span>
 
-                  Status: Connected
+                  Status: {sqlStatus}
 
                 </span>
 
@@ -1525,7 +1693,7 @@ function Dashboard() {
 
                   <Clock3 size={12} />
 
-                  Last fetched: --
+                  Last fetched: {sqlFetchedAt}
 
                 </span>
 

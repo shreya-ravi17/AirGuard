@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, Float, String, DateTime
-from datetime import datetime
 from .database import Base
+from .timeutil import utcnow
 
 class SensorReading(Base):
     __tablename__ = "sensor_readings"
@@ -10,7 +10,7 @@ class SensorReading(Base):
     city = Column(String, index=True)
     latitude = Column(Float)
     longitude = Column(Float)
-    timestamp = Column(DateTime, default=datetime.utcnow)
+    timestamp = Column(DateTime, default=utcnow)
 
     co = Column(Float)
     nh3 = Column(Float)

@@ -1,5 +1,5 @@
-
-const API_BASE_URL = "http://localhost:8000";
+export const API_BASE_URL =
+  import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
 
 // ======================================================
@@ -54,25 +54,19 @@ export const sendSensorData = async (sensorData) => {
 
 
 // ======================================================
-// PMS SENSOR DATA
-//
-// IMPORTANT:
-// The exact PMS backend endpoint has not been provided yet.
-// This function is prepared so the Dashboard can use it
-// once the backend endpoint is available.
+// PMS DATA  (FETCH PMS DATA button)
+// External PM2.5 / PM10 from the project dataset.
+// NOT measured by the AirGuard mask.
 // ======================================================
 
-export const fetchPMSData = async () => {
-  const response = await fetch(
-    `${API_BASE_URL}/api/pms`
-  );
+export const fetchPMSData = async (city) => {
+  const query = city ? `?city=${encodeURIComponent(city)}` : "";
+
+  const response = await fetch(`${API_BASE_URL}/api/pms${query}`);
 
   if (!response.ok) {
-    const errorText = await response.text();
-
-    throw new Error(
-      `Failed to fetch PMS data: ${response.status} ${errorText}`
-    );
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || `Failed to fetch PMS data (${response.status})`);
   }
 
   return response.json();
@@ -80,24 +74,16 @@ export const fetchPMSData = async () => {
 
 
 // ======================================================
-// XAMPP / MYSQL DATA
-//
-// IMPORTANT:
-// The exact SQL backend endpoint has not been provided yet.
-// This function is prepared for the XAMPP/MySQL fetch.
+// XAMPP / MYSQL DATA  (FETCH FROM SQL button)
+// Latest real ESP32 reading stored in XAMPP/MySQL.
 // ======================================================
 
 export const fetchSQLData = async () => {
-  const response = await fetch(
-    `${API_BASE_URL}/api/sql`
-  );
+  const response = await fetch(`${API_BASE_URL}/api/sql`);
 
   if (!response.ok) {
-    const errorText = await response.text();
-
-    throw new Error(
-      `Failed to fetch SQL data: ${response.status} ${errorText}`
-    );
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.detail || `Failed to fetch SQL data (${response.status})`);
   }
 
   return response.json();
@@ -169,10 +155,10 @@ export const exportHistory = async () => {
 // GET /api/trend
 // ======================================================
 
-export const getTrend = async () => {
+export const getTrend = async (range = "1D") => {
 
   const response = await fetch(
-    `${API_BASE_URL}/api/trend`
+    `${API_BASE_URL}/api/trend?range=${encodeURIComponent(range)}`
   );
 
   if (!response.ok) {
@@ -190,10 +176,10 @@ export const getTrend = async () => {
 // GET /api/stats
 // ======================================================
 
-export const getStats = async () => {
+export const getStats = async (range = "1D") => {
 
   const response = await fetch(
-    `${API_BASE_URL}/api/stats`
+    `${API_BASE_URL}/api/stats?range=${encodeURIComponent(range)}`
   );
 
   if (!response.ok) {
@@ -333,12 +319,6 @@ const api = {
   // Sensor data
   sendSensorData,
 
-  // PMS
-  fetchPMSData,
-
-  // XAMPP / MySQL
-  fetchSQLData,
-
   // History
   getHistory,
   exportHistory,
@@ -353,6 +333,10 @@ const api = {
   // Temporary backward compatibility
   getForecast,
 
+  // Data sources (FETCH PMS DATA / FETCH FROM SQL)
+  fetchPMSData,
+  fetchSQLData,
+
   // Alerts
   getAlerts,
 
@@ -363,4 +347,3 @@ const api = {
 
 
 export default api;
-

@@ -23,6 +23,37 @@ RANGE_MAP = {
 }
 
 
+def iso_utc(ts):
+    """Timestamps are stored as naive UTC. Add 'Z' so the browser converts to local time correctly."""
+    return ts.isoformat() + "Z" if ts else None
+
+
+def serialize_reading(r) -> dict:
+    """One history row in the shape the frontend Dashboard expects."""
+    source = r.city if r.city and r.city != "Unknown" else r.device_id
+    return {
+        "id": r.id,
+        "timestamp": iso_utc(r.timestamp),
+        "device_id": r.device_id,
+        "city": r.city,
+        "source": source,
+        "latitude": r.latitude,
+        "longitude": r.longitude,
+        "co": r.co,
+        "nh3": r.nh3,
+        "no2": r.no2,
+        "nox": r.nox,
+        "pm2_5": r.pm2_5,
+        "pm10": r.pm10,
+        "temperature": r.temperature,
+        "humidity": r.humidity,
+        "aqi": r.aqi_value,
+        "aqi_value": r.aqi_value,
+        "status": r.aqi_category,
+        "aqi_category": r.aqi_category,
+    }
+
+
 def get_recommendation(category: str) -> str:
     tips = {
         "Good": "Air quality is good. Enjoy outdoor activities.",
@@ -61,9 +92,14 @@ def get_current_aqi(db: Session = Depends(get_db)):
     if not latest:
         return {"message": "No readings yet"}
     return {
+        "id": latest.id,
+        "device_id": latest.device_id,
+        "city": latest.city,
+        "latitude": latest.latitude,
+        "longitude": latest.longitude,
         "aqi_value": latest.aqi_value,
         "aqi_category": latest.aqi_category,
-        "timestamp": latest.timestamp,
+        "timestamp": iso_utc(latest.timestamp),
         "co": latest.co,
         "nh3": latest.nh3,
         "no2": latest.no2,
@@ -78,12 +114,15 @@ def get_current_aqi(db: Session = Depends(get_db)):
 
 @router.get("/history")
 def get_history(
-    page: int = 1,
-    page_size: int = 20,
+    page: int = Query(1, ge=1),
+    page_size: Optional[int] = Query(None, ge=1, le=200),
+    limit: Optional[int] = Query(None, ge=1, le=200),  # frontend sends ?limit=
     search: Optional[str] = None,
     date: Optional[date_type] = None,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
+    size = page_size or limit or 20
+
     query = db.query(models.SensorReading)
 
     if search:
@@ -92,20 +131,25 @@ def get_history(
     if date:
         query = query.filter(func.date(models.SensorReading.timestamp) == date)
 
-    offset = (page - 1) * page_size
     total = query.count()
+    total_pages = max(1, -(-total // size))  # ceil division
+
     readings = (
         query.order_by(desc(models.SensorReading.timestamp))
-        .offset(offset)
-        .limit(page_size)
+        .offset((page - 1) * size)
+        .limit(size)
         .all()
     )
+    rows = [serialize_reading(r) for r in readings]
 
     return {
         "total": total,
+        "total_records": total,
+        "total_pages": total_pages,
         "page": page,
-        "page_size": page_size,
-        "data": readings
+        "page_size": size,
+        "records": rows,
+        "data": rows,
     }
 
 
@@ -149,7 +193,7 @@ def get_trend(range: str = "1D", db: Session = Depends(get_db)):
     return {
         "range": range,
         "points": [
-            {"timestamp": r.timestamp, "aqi_value": r.aqi_value, "category": r.aqi_category}
+            {"timestamp": iso_utc(r.timestamp), "aqi_value": r.aqi_value, "category": r.aqi_category}
             for r in readings
         ]
     }
@@ -186,7 +230,7 @@ def get_forecast(db: Session = Depends(get_db)):
     daily_avg = (
         db.query(
             func.date(models.SensorReading.timestamp).label("day"),
-            func.avg(models.SensorReading.aqi_value).label("avg_aqi")
+            func.avg(models.SensorReading.aqi_value).label("avg_aqi"),
         )
         .group_by(func.date(models.SensorReading.timestamp))
         .order_by(desc("day"))
@@ -197,22 +241,30 @@ def get_forecast(db: Session = Depends(get_db)):
     if len(daily_avg) < 3:
         return {
             "message": "Not enough data yet. Forecast needs at least 3 days of readings.",
-            "days_available": len(daily_avg)
+            "days_available": len(daily_avg),
         }
 
-    day1 = round(daily_avg[0].avg_aqi, 1)
-    day2 = round(daily_avg[1].avg_aqi, 1)
-    day3 = round(daily_avg[2].avg_aqi, 1)
+    day1 = round(float(daily_avg[0].avg_aqi), 1)
+    day2 = round(float(daily_avg[1].avg_aqi), 1)
+    day3 = round(float(daily_avg[2].avg_aqi), 1)
 
     result = forecast_next_aqi(aqi_day1=day1, aqi_day2=day2, aqi_day3=day3)
     confidence = get_forecast_confidence(day1, day2, day3)
+    risk = get_risk_level(result["forecast_aqi"])
+
+    # Oldest -> newest, so the frontend shows the last 3 days in order
+    history = [
+        {"day": f"Day {i + 1}", "date": str(row.day), "aqi": round(float(row.avg_aqi), 1)}
+        for i, row in enumerate(reversed(daily_avg))
+    ]
 
     return {
         "predicted_aqi": result["forecast_aqi"],
-        "risk_level": get_risk_level(result["forecast_aqi"]),
+        "risk_level": risk,
         "confidence": confidence,
+        "history": history,
         "based_on": result["input_history"],
-        "recommendation": get_recommendation(get_risk_level(result["forecast_aqi"])),
+        "recommendation": get_recommendation(risk),
     }
 
 
@@ -234,7 +286,7 @@ def get_alerts(db: Session = Depends(get_db)):
         if curr.aqi_category in severity_order and prev.aqi_category in severity_order:
             if severity_order.index(curr.aqi_category) > severity_order.index(prev.aqi_category):
                 alerts.append({
-                    "timestamp": curr.timestamp,
+                    "timestamp": iso_utc(curr.timestamp),
                     "message": f"AQI worsened from {prev.aqi_category} to {curr.aqi_category}",
                     "aqi_value": curr.aqi_value,
                 })

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 
 import {
@@ -35,6 +34,8 @@ function Prediction() {
 
   const [prediction, setPrediction] = useState(0);
 
+  const [confidence, setConfidence] = useState(null);
+
   const [loading, setLoading] = useState(true);
 
   const [error, setError] = useState("");
@@ -48,56 +49,48 @@ function Prediction() {
 
   const getAQIStatus = (aqi) => {
 
-    if (aqi <= 50) {
+    // Same CPCB bands used by the backend + ML model
+    if (aqi <= 100) {
       return {
         label: "Good",
         className: "good",
         description:
-          "Air quality is satisfactory.",
-      };
-    }
-
-    if (aqi <= 100) {
-      return {
-        label: "Moderate",
-        className: "moderate",
-        description:
-          "Air quality is acceptable, but some concern may exist.",
-      };
-    }
-
-    if (aqi <= 150) {
-      return {
-        label: "Unhealthy for Sensitive Groups",
-        className: "sensitive",
-        description:
-          "Sensitive people may experience health effects.",
+          "Air quality is good. Enjoy outdoor activities.",
       };
     }
 
     if (aqi <= 200) {
       return {
-        label: "Unhealthy",
-        className: "unhealthy",
+        label: "Moderate",
+        className: "moderate",
         description:
-          "Everyone may begin to experience health effects.",
+          "Sensitive groups should reduce prolonged outdoor exertion.",
       };
     }
 
     if (aqi <= 300) {
       return {
-        label: "Very Unhealthy",
+        label: "Poor",
+        className: "unhealthy",
+        description:
+          "Consider wearing a mask outdoors and limiting exposure.",
+      };
+    }
+
+    if (aqi <= 400) {
+      return {
+        label: "Very Poor",
         className: "very-unhealthy",
         description:
-          "Health alert: increased risk of health effects.",
+          "Avoid outdoor activity. Wear a mask if you must go out.",
       };
     }
 
     return {
-      label: "Hazardous",
+      label: "Severe",
       className: "hazardous",
       description:
-        "Health warning of emergency conditions.",
+        "Stay indoors. Air quality is hazardous.",
     };
   };
 
@@ -129,6 +122,14 @@ function Prediction() {
       const currentData = await getCurrent();
 
       console.log("Current data:", currentData);
+
+      // Backend sends { message, days_available } until 3 days of data exist
+      if (data?.message && data?.predicted_aqi === undefined) {
+        setError(data.message);
+        setConfidence(null);
+      } else if (data?.confidence !== undefined) {
+        setConfidence(Number(data.confidence));
+      }
 
 
       // ========================================
@@ -545,7 +546,7 @@ function Prediction() {
               </span>
 
               <strong>
-                86%
+                {confidence !== null ? `${confidence}%` : "--"}
               </strong>
 
             </div>
@@ -556,7 +557,7 @@ function Prediction() {
               <div
                 className="confidence-progress"
                 style={{
-                  width: "86%",
+                  width: `${confidence ?? 0}%`,
                 }}
               ></div>
 
@@ -916,4 +917,3 @@ function Prediction() {
 
 
 export default Prediction;
-
