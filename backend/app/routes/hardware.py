@@ -2,7 +2,7 @@ from typing import Optional
 
 from fastapi import APIRouter, HTTPException, Query
 
-from .. import mysql_bridge, pms_source
+from .. import hardware_aqi, mysql_bridge, pms_source
 
 router = APIRouter(prefix="/api", tags=["data-sources"])
 
@@ -11,9 +11,12 @@ router = APIRouter(prefix="/api", tags=["data-sources"])
 def fetch_from_sql():
     """FETCH FROM SQL - latest real ESP32 reading from XAMPP/MySQL."""
     try:
-        return mysql_bridge.get_latest_reading()
+        result = mysql_bridge.get_latest_reading()
     except mysql_bridge.HardwareDBError as exc:
         raise HTTPException(status_code=503, detail=str(exc))
+
+    result["estimated_aqi"] = hardware_aqi.estimate_aqi(result["reading"])
+    return result
 
 
 @router.get("/pms")

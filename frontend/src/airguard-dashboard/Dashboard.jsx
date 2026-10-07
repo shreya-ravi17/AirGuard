@@ -35,55 +35,51 @@ const HISTORY_LIMIT = 5;
 
 const defaultSensorData = [
   {
-    name: "Carbon Monoxide (CO)",
-    value: "0.00",
-    unit: "ppm",
-    status: "Good",
-    type: "green",
-    icon: "CO",
+    key: "mq7",
+    name: "MQ-7 (CO sensor)",
+    value: "--",
+    unit: "raw",
+    status: "Waiting for XAMPP",
+    type: "blue",
+    icon: "MQ7",
   },
 
   {
-    name: "Ammonia (NH₃)",
-    value: "0.00",
-    unit: "ppm",
-    status: "Good",
-    type: "green",
-    icon: "NH₃",
+    key: "mq135",
+    name: "MQ-135 (air quality)",
+    value: "--",
+    unit: "raw",
+    status: "Waiting for XAMPP",
+    type: "blue",
+    icon: "135",
   },
 
   {
-    name: "Nitrogen Dioxide (NO₂)",
-    value: "0.00",
-    unit: "ppm",
-    status: "Good",
-    type: "green",
-    icon: "NO₂",
+    key: "mq2",
+    name: "MQ-2 (smoke / LPG)",
+    value: "--",
+    unit: "raw",
+    status: "Waiting for XAMPP",
+    type: "blue",
+    icon: "MQ2",
   },
 
   {
-    name: "Nitrogen Oxides (NOx)",
-    value: "0.00",
-    unit: "ppm",
-    status: "Good",
-    type: "green",
-    icon: "NOx",
-  },
-
-  {
+    key: "temperature",
     name: "Temperature",
-    value: "0.0",
+    value: "--",
     unit: "°C",
-    status: "Comfortable",
+    status: "Waiting for XAMPP",
     type: "blue",
     icon: "°",
   },
 
   {
+    key: "humidity",
     name: "Humidity",
-    value: "0",
+    value: "--",
     unit: "%",
-    status: "Comfortable",
+    status: "Waiting for XAMPP",
     type: "blue",
     icon: "%",
   },
@@ -311,31 +307,9 @@ function Dashboard() {
         // Backend returns { message: "No readings yet" } on an empty DB
         if (cancelled || data?.aqi_value === undefined) return;
 
-        setCurrentAQI(Math.round(Number(data.aqi_value)));
-        setCurrentAQIStatus(data.aqi_category || "Unknown");
-
         if (data.city) setLocationName(data.city);
         setLatitude(formatCoord(data.latitude, "N", "S"));
         setLongitude(formatCoord(data.longitude, "E", "W"));
-
-        const liveValues = {
-          "CO": [data.co, 2],
-          "NH₃": [data.nh3, 2],
-          "NO₂": [data.no2, 2],
-          "NOx": [data.nox, 2],
-          "°": [data.temperature, 1],
-          "%": [data.humidity, 0],
-        };
-
-        setSensorData((previous) =>
-          previous.map((item) => {
-            const entry = liveValues[item.icon];
-            if (!entry || entry[0] === null || entry[0] === undefined) {
-              return item;
-            }
-            return { ...item, value: Number(entry[0]).toFixed(entry[1]) };
-          })
-        );
       } catch (error) {
         console.error("Current data fetch error:", error);
       }
@@ -349,6 +323,65 @@ function Dashboard() {
       clearInterval(timer);
     };
   }, []);
+
+  /* =======================================================
+     LIVE HARDWARE READINGS  (XAMPP/MySQL via GET /api/sql)
+     Refreshes automatically every 5 seconds - no button needed.
+     ======================================================= */
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadHardware = async () => {
+      try {
+        const data = await fetchSQLData();
+        const reading = data?.reading;
+
+        if (cancelled || !reading) return;
+
+        const formatters = {
+          mq7: (v) => String(Math.round(Number(v))),
+          mq135: (v) => String(Math.round(Number(v))),
+          mq2: (v) => String(Math.round(Number(v))),
+          temperature: (v) => Number(v).toFixed(1),
+          humidity: (v) => Number(v).toFixed(1),
+        };
+
+        if (data.estimated_aqi) {
+          setCurrentAQI(data.estimated_aqi.value);
+          setCurrentAQIStatus(data.estimated_aqi.category);
+        }
+
+        setSensorData((previous) =>
+          previous.map((item) => {
+            const raw = reading[item.key];
+            if (raw === null || raw === undefined) return item;
+            return {
+              ...item,
+              value: formatters[item.key](raw),
+              status: "Live from XAMPP",
+            };
+          })
+        );
+      } catch (error) {
+        console.error("Hardware data fetch error:", error);
+        if (cancelled) return;
+        setCurrentAQIStatus("XAMPP offline");
+        setSensorData((previous) =>
+          previous.map((item) => ({ ...item, status: "XAMPP offline" }))
+        );
+      }
+    };
+
+    loadHardware();
+    const timer = setInterval(loadHardware, 5000);
+
+    return () => {
+      cancelled = true;
+      clearInterval(timer);
+    };
+  }, []);
+
 
   /* =======================================================
      DATA SOURCES  (FETCH PMS DATA / FETCH FROM SQL)
@@ -1297,7 +1330,7 @@ function Dashboard() {
               </h2>
 
               <p>
-                Bengaluru, India
+                Estimated from ESP32 MQ sensors
               </p>
 
             </div>
@@ -1314,7 +1347,7 @@ function Dashboard() {
               <div className="aqi-inner">
 
                 <span className="aqi-label">
-                  AQI
+                  AQI (est.)
                 </span>
 
                 <strong>
@@ -1354,9 +1387,9 @@ function Dashboard() {
                 </strong>
 
                 <p>
-                  Keep monitoring
+                  Estimated from MQ
                   <br />
-                  for better health.
+                  sensors, not official.
                 </p>
 
               </div>
