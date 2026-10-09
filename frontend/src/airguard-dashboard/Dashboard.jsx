@@ -31,37 +31,49 @@ const HISTORY_LIMIT = 5;
 
 /* =========================================================
    DEFAULT ENVIRONMENTAL READINGS
+   Gas values are in ppm (converted on the backend from the
+   MQ sensors' raw ADC values). NO2 / NOx are estimates.
    ========================================================= */
 
 const defaultSensorData = [
   {
-    key: "mq7",
-    name: "MQ-7 (CO sensor)",
+    key: "co_ppm",
+    name: "Carbon Monoxide (CO)",
     value: "--",
-    unit: "raw",
+    unit: "ppm",
     status: "Waiting for XAMPP",
     type: "blue",
-    icon: "MQ7",
+    icon: "CO",
   },
 
   {
-    key: "mq135",
-    name: "MQ-135 (air quality)",
+    key: "nh3_ppm",
+    name: "Ammonia (NH₃)",
     value: "--",
-    unit: "raw",
+    unit: "ppm",
     status: "Waiting for XAMPP",
     type: "blue",
-    icon: "135",
+    icon: "NH₃",
   },
 
   {
-    key: "mq2",
-    name: "MQ-2 (smoke / LPG)",
+    key: "no2_ppm",
+    name: "Nitrogen Dioxide (NO₂)",
     value: "--",
-    unit: "raw",
+    unit: "ppm",
     status: "Waiting for XAMPP",
     type: "blue",
-    icon: "MQ2",
+    icon: "NO₂",
+  },
+
+  {
+    key: "nox_ppm",
+    name: "Nitrogen Oxides (NOx)",
+    value: "--",
+    unit: "ppm",
+    status: "Waiting for XAMPP",
+    type: "blue",
+    icon: "NOx",
   },
 
   {
@@ -84,6 +96,53 @@ const defaultSensorData = [
     icon: "%",
   },
 ];
+
+/* =========================================================
+   STATUS LABEL FOR EACH ENVIRONMENTAL READING
+   (simple bands, not an official standard)
+   ========================================================= */
+
+const readingStatus = (key, v) => {
+  const n = Number(v);
+
+  // [Good up to, Moderate up to] in ppm
+  const gasBands = {
+    co_ppm: [9, 35],
+    nh3_ppm: [25, 50],
+    no2_ppm: [0.1, 0.3],
+    nox_ppm: [0.2, 0.5],
+  };
+
+  if (gasBands[key]) {
+    return n <= gasBands[key][0]
+      ? "Good"
+      : n <= gasBands[key][1]
+      ? "Moderate"
+      : "Poor";
+  }
+
+  if (key === "temperature") {
+    return n < 18
+      ? "Cool"
+      : n <= 28
+      ? "Comfortable"
+      : n <= 35
+      ? "Warm"
+      : "Hot";
+  }
+
+  if (key === "humidity") {
+    return n < 30
+      ? "Dry"
+      : n <= 60
+      ? "Comfortable"
+      : n <= 80
+      ? "Humid"
+      : "Very humid";
+  }
+
+  return "Live from XAMPP";
+};
 
 /* =========================================================
    DEFAULT HISTORY DATA
@@ -307,6 +366,12 @@ function Dashboard() {
         // Backend returns { message: "No readings yet" } on an empty DB
         if (cancelled || data?.aqi_value === undefined) return;
 
+        // This is the REAL model-predicted AQI (predict_aqi(), from
+        // /api/hardware/predict -> PostgreSQL -> /api/current). It takes
+        // priority over the raw XAMPP estimate set in loadHardware() below.
+        setCurrentAQI(data.aqi_value);
+        setCurrentAQIStatus(data.aqi_category);
+
         if (data.city) setLocationName(data.city);
         setLatitude(formatCoord(data.latitude, "N", "S"));
         setLongitude(formatCoord(data.longitude, "E", "W"));
@@ -340,26 +405,37 @@ function Dashboard() {
         if (cancelled || !reading) return;
 
         const formatters = {
-          mq7: (v) => String(Math.round(Number(v))),
-          mq135: (v) => String(Math.round(Number(v))),
-          mq2: (v) => String(Math.round(Number(v))),
+          co_ppm: (v) => Number(v).toFixed(2),
+          nh3_ppm: (v) => Number(v).toFixed(2),
+          no2_ppm: (v) => Number(v).toFixed(2),
+          nox_ppm: (v) => Number(v).toFixed(2),
           temperature: (v) => Number(v).toFixed(1),
           humidity: (v) => Number(v).toFixed(1),
         };
 
-        if (data.estimated_aqi) {
-          setCurrentAQI(data.estimated_aqi.value);
-          setCurrentAQIStatus(data.estimated_aqi.category);
-        }
+        // Fallback only: the real AQI (from the trained model, via
+        // loadCurrent() above) takes priority once it has loaded. This
+        // crude min-max estimate just fills the gauge before that first
+        // /api/current response arrives.
+        setCurrentAQI((prev) =>
+          prev === "--" && data.estimated_aqi ? data.estimated_aqi.value : prev
+        );
+        setCurrentAQIStatus((prev) =>
+          prev === "No data" && data.estimated_aqi
+            ? data.estimated_aqi.category
+            : prev
+        );
 
         setSensorData((previous) =>
           previous.map((item) => {
-            const raw = reading[item.key];
+            const raw = item.key.endsWith("_ppm")
+              ? data.gases_ppm?.[item.key]
+              : reading[item.key];
             if (raw === null || raw === undefined) return item;
             return {
               ...item,
               value: formatters[item.key](raw),
-              status: "Live from XAMPP",
+              status: readingStatus(item.key, raw),
             };
           })
         );
